@@ -245,7 +245,13 @@ public class doggyBot extends TelegramLongPollingBot {
                 }
                 if (command.equals("/start")) {
                     message.setText("輸入/dog去搵一隻狗");
+                    try {
+                        execute(message);
+                    } catch (TelegramApiException e) {
+                        e.printStackTrace();
+                    }
                 }
+
                 //當玩家輸入/name
                 if (command.contains("/name")) {
                     String temp = getSpace(update.getMessage().getText());
