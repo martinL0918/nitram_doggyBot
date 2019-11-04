@@ -11,11 +11,12 @@ public class Dog {
     private int dogCounter;//睇下有無開過狗
     private String sex;
     private boolean confirm ;
-    private boolean wantToKill;
     private int temp;
     private boolean toggle_number;
     public Timer timer = new Timer();
     private int relationship;
+    private boolean exploring = false;
+    private int currency;
 
     public Dog() {
         this.health = 100;
@@ -32,6 +33,16 @@ public class Dog {
         this.toggle_number = false;
         this.timer = timer;
         this.relationship = 0;
+        this.exploring = false;
+        this.currency = 0;
+    }
+
+    public int getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(int currency) {
+        this.currency = currency;
     }
 
     public int getHealth() {
@@ -144,5 +155,13 @@ public class Dog {
 
     public void setRelationship(int relationship) {
         this.relationship = relationship;
+    }
+
+    public boolean isExploring() {
+        return exploring;
+    }
+
+    public void setExploring(boolean exploring) {
+        this.exploring = exploring;
     }
 }
