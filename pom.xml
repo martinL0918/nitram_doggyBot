@@ -32,7 +32,7 @@
                     <assembleDirectory>target</assembleDirectory>
                     <programs>
                         <program>
-                            <mainClass>com.nirtamit9.Main</mainClass>
+                            <mainClass>com.nirtamit9.doggyBot</mainClass>
                             <name>doggyBot</name>
                         </program>
                     </programs>
