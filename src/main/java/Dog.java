@@ -19,6 +19,7 @@ public class Dog {
     private boolean dogAlive = true;
     private Timer timer;
     private Timer hungerTimer;
+    private boolean running;
 
     public Timer getHungerTimer() {
         return hungerTimer;
@@ -48,6 +49,7 @@ public class Dog {
         this.exploring = false;
         this.timer = new Timer();
         this.hungerTimer = new Timer();
+        this.running = false;
     }
 
     public int getCurrency() {
@@ -178,5 +180,13 @@ public class Dog {
 
     public void setDogAlive(boolean dogAlive) {
         this.dogAlive = dogAlive;
+    }
+
+    public boolean isRunning() {
+        return running;
+    }
+
+    public void setRunning(boolean running) {
+        this.running = running;
     }
 }
