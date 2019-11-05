@@ -13,10 +13,20 @@ public class Dog {
     private boolean confirm ;
     private int temp;
     private boolean toggle_number;
-    public Timer timer = new Timer();
     private int relationship;
     private boolean exploring = false;
     private int currency;
+    private boolean dogAlive = true;
+    private Timer timer;
+    private Timer hungerTimer;
+
+    public Timer getHungerTimer() {
+        return hungerTimer;
+    }
+
+    public void setHungerTimer(Timer hungerTimer) {
+        this.hungerTimer = hungerTimer;
+    }
 
     public Dog() {
         this.health = 100;
@@ -31,10 +41,13 @@ public class Dog {
         this.confirm = false;
         this.temp = 0;
         this.toggle_number = false;
-        this.timer = timer;
         this.relationship = 0;
         this.exploring = false;
         this.currency = 0;
+        this.dogAlive = true;
+        this.exploring = false;
+        this.timer = new Timer();
+        this.hungerTimer = new Timer();
     }
 
     public int getCurrency() {
@@ -61,13 +74,7 @@ public class Dog {
         this.hunger = hunger;
     }
 
-    /*public int getCurrent() {
-        return current;
-    }*/
 
-    /*public void setCurrent(int current) {
-        this.current = current;
-    }*/
 
     public int getGeneration() {
         return generation;
@@ -163,5 +170,13 @@ public class Dog {
 
     public void setExploring(boolean exploring) {
         this.exploring = exploring;
+    }
+
+    public boolean isDogAlive() {
+        return dogAlive;
+    }
+
+    public void setDogAlive(boolean dogAlive) {
+        this.dogAlive = dogAlive;
     }
 }
