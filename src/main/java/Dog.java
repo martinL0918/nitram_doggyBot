@@ -20,6 +20,8 @@ public class Dog {
     private Timer timer;
     private Timer hungerTimer;
     private boolean running;
+    private boolean toggle_settingRelationship;
+    private boolean toggle_settingCurrency;
 
     public Timer getHungerTimer() {
         return hungerTimer;
@@ -50,6 +52,8 @@ public class Dog {
         this.timer = new Timer();
         this.hungerTimer = new Timer();
         this.running = false;
+        this.toggle_settingRelationship = false;
+        this.toggle_settingCurrency = false;
     }
 
     public int getCurrency() {
@@ -188,5 +192,21 @@ public class Dog {
 
     public void setRunning(boolean running) {
         this.running = running;
+    }
+
+    public boolean isToggle_settingRelationship() {
+        return toggle_settingRelationship;
+    }
+
+    public void setToggle_settingRelationship(boolean toggle_settingRelationship) {
+        this.toggle_settingRelationship = toggle_settingRelationship;
+    }
+
+    public boolean isToggle_settingCurrency() {
+        return toggle_settingCurrency;
+    }
+
+    public void setToggle_settingCurrency(boolean toggle_settingCurrency) {
+        this.toggle_settingCurrency = toggle_settingCurrency;
     }
 }
