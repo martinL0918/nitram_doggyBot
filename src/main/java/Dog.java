@@ -1,16 +1,17 @@
+import java.util.HashMap;
 import java.util.Timer;
 
 public class Dog {
     private int health;
+    private int maximumHealth;
     private int hunger;
-    //private int current;
     private int generation;
     //private int love;
     private String name;
     //private String loveStatus;
     private int dogCounter;//睇下有無開過狗
     private String sex;
-    private boolean confirm ;
+    private boolean confirm;
     private int temp;
     private boolean toggle_number;
     private int relationship;
@@ -22,6 +23,9 @@ public class Dog {
     private boolean running;
     private boolean toggle_settingRelationship;
     private boolean toggle_settingCurrency;
+    private int level;
+    private int exp;
+
 
     public Timer getHungerTimer() {
         return hungerTimer;
@@ -32,7 +36,8 @@ public class Dog {
     }
 
     public Dog() {
-        this.health = 100;
+        this.health = 30;
+        this.maximumHealth = 30;
         this.hunger = 50;
         //this.current = current;
         this.generation = 1;
@@ -54,7 +59,12 @@ public class Dog {
         this.running = false;
         this.toggle_settingRelationship = false;
         this.toggle_settingCurrency = false;
+        this.level = 1;
+        this.exp = 1;
     }
+
+
+
 
     public int getCurrency() {
         return currency;
@@ -208,5 +218,29 @@ public class Dog {
 
     public void setToggle_settingCurrency(boolean toggle_settingCurrency) {
         this.toggle_settingCurrency = toggle_settingCurrency;
+    }
+
+    public int getMaximumHealth() {
+        return maximumHealth;
+    }
+
+    public void setMaximumHealth(int maxmimumHealth) {
+        this.maximumHealth = maxmimumHealth;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public int getExp() {
+        return exp;
+    }
+
+    public void setExp(int exp) {
+        this.exp = exp;
     }
 }
