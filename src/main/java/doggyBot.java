@@ -931,8 +931,6 @@ public class doggyBot extends TelegramLongPollingBot {
     @Override
     public String getBotToken() {
         // TODO
-        return "844161272:AAFSfCUKlWHCukJhjAjzjDze577oYcvdj3k";
-        //Online :"844161272:AAFSfCUKlWHCukJhjAjzjDze577oYcvdj3k";
-        //Test   :"1032223034:AAFcHuiTtpTcB2_9jpMw9V-TGbhsfHC-RuY";
+        return "api_key";
     }
 }
