@@ -472,21 +472,22 @@ public class doggyBot extends TelegramLongPollingBot {
                             e.printStackTrace();
                         }
                     }
-                    if (command.equals(("/achievements"))){
+                    if (command.equals(("/achievements"))) {
                         String welcoming = "成就系統\n" +
-                                "你已達成"+dictionary.get(update.getMessage().getFrom().getId()).getAchievedAchievements().size()+"/"+totalAchievements.size()+"個成就\n\n";
+                                "你已達成" + dictionary.get(update.getMessage().getFrom().getId()).getAchievedAchievements().size() + "/" + totalAchievements.size() + "個成就\n\n";
                         String printAll = "";
-                        for (String temp:totalAchievements.keySet()){
-                            for (String archievedTemp: dictionary.get(update.getMessage().getFrom().getId()).getAchievedAchievements())
-                                if (archievedTemp.equals(temp)){
-                                    printAll += "\uD83C\uDF1F「"+ temp +"」"+ "\n\t\t\t\t-"+ totalAchievements.get(temp)+"\n";
+                        for (String temp : totalAchievements.keySet()) {
+                            for (String archievedTemp : dictionary.get(update.getMessage().getFrom().getId()).getAchievedAchievements()) {
+                                if (archievedTemp.equals(temp)) {
+                                    printAll += "\uD83C\uDF1F「" + temp + "」" + "\n\t\t\t\t-" + totalAchievements.get(temp) + "\n";
                                 }
-                        }
-                        message.setText(welcoming+printAll);
-                        try {
-                            execute(message);
-                        } catch (TelegramApiException e) {
-                            e.printStackTrace();
+                            }
+                            message.setText(welcoming + printAll);
+                            try {
+                                execute(message);
+                            } catch (TelegramApiException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                     if (command.equals("/version")){
@@ -617,9 +618,9 @@ public class doggyBot extends TelegramLongPollingBot {
                                 markupInline.setKeyboard(rowsInline);
                                 message.setReplyMarkup(markupInline);
                             } else
-                                command.equals("輸入/name [name] 幫我改過名先啦");
+                                message.setText("輸入/name [name] 幫我改過名先啦");
                         } else
-                            command.equals("輸入 /dog 去搵隻狗先啦");
+                            message.setText("輸入 /dog 去搵隻狗先啦");
                         try {
                             execute(message);
                         } catch (TelegramApiException e) {
@@ -931,6 +932,8 @@ public class doggyBot extends TelegramLongPollingBot {
     @Override
     public String getBotToken() {
         // TODO
-        return "api_key";
+        return "844161272:AAFSfCUKlWHCukJhjAjzjDze577oYcvdj3k";
+        //Online :"844161272:AAFSfCUKlWHCukJhjAjzjDze577oYcvdj3k";
+        //Test   :"1032223034:AAFcHuiTtpTcB2_9jpMw9V-TGbhsfHC-RuY";
     }
 }
