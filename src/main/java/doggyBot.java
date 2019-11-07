@@ -731,7 +731,7 @@ public class doggyBot extends TelegramLongPollingBot {
                 String command = update.getMessage().getText();
                 SendMessage message = new SendMessage();
                 message.setChatId(update.getMessage().getChatId());
-                message.setText("\uD83D\uDC3E" + dictionary.get(update.getMessage().getFrom().getId()).getName() + "你隻狗死左啦\uD83D\uDC80");
+                message.setText("\uD83D\uDC3E" + dictionary.get(update.getMessage().getFrom().getId()).getName() + "死左啦\uD83D\uDC80");
                 dictionary.remove(update.getMessage().getFrom().getId());
                 //removeAllData();
                 try {
