@@ -482,13 +482,13 @@ public class doggyBot extends TelegramLongPollingBot {
                                     printAll += "\uD83C\uDF1F「" + temp + "」" + "\n\t\t\t\t-" + totalAchievements.get(temp) + "\n";
                                 }
                             }
+                        }
                             message.setText(welcoming + printAll);
                             try {
                                 execute(message);
                             } catch (TelegramApiException e) {
                                 e.printStackTrace();
                             }
-                        }
                     }
                     if (command.equals("/version")){
                         message.setText("小狗的RPG歷險記\uD83D\uDC36\n" +

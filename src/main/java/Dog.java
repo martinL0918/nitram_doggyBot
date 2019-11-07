@@ -40,7 +40,7 @@ public class Dog {
     }
 
     public Dog() {
-        this.health = 1;
+        this.health = 30;
         this.maximumHealth = 30;
         this.hunger = 50;
         //this.current = current;
