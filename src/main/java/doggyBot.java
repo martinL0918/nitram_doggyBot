@@ -15,6 +15,8 @@ import static java.lang.Math.toIntExact;
 public class doggyBot extends TelegramLongPollingBot {
     private HashMap<Integer, Dog> dictionary = new HashMap<>();
     public  HashMap<Integer, Integer> growCurve = new HashMap<>();
+    public HashMap<String, String> totalAchievements = new HashMap<>();
+
 
     public void initalizeGrowCurve() {
         growCurve.put(1,12);
@@ -26,7 +28,17 @@ public class doggyBot extends TelegramLongPollingBot {
         growCurve.put(7,384);
         growCurve.put(8,768);
     }
-    //private int update.getMessage().getFrom().getId();
+    public void initalizeTotalAchievements(){
+        totalAchievements.put("愛狗之人","和狗隻親密度達到30");
+        totalAchievements.put("狗的好夥伴","和狗隻親密度達至50");
+        totalAchievements.put("你前世係狗","和狗隻親密度達至100");
+        totalAchievements.put("多些一舉","狗隻生命值全滿時幫他補血");
+        totalAchievements.put("病態賭徒","在競技埸挑戰10次");
+        totalAchievements.put("新手上路","命令狗隻前往探險");
+        totalAchievements.put("殺狗狂徒","曾經企圖殺狗");
+        totalAchievements.put("大富翁","彩產超過$2500");
+
+    }
     public void setTimer(int seconds,Update update) {
         dictionary.get(update.getMessage().getFrom().getId()).getTimer().schedule(new TimerTask() {
             @Override
@@ -43,6 +55,7 @@ public class doggyBot extends TelegramLongPollingBot {
                     } catch (TelegramApiException e) {
                         e.printStackTrace();
                 }
+                    checkHPleft(update);
                     checkExpLevelUp(update);
             }
         }, seconds * 1000); //?60?-1???
@@ -91,7 +104,7 @@ public class doggyBot extends TelegramLongPollingBot {
         SendMessage message = new SendMessage();
         message.setChatId(update.getMessage().getChatId());
         if (hp <=0){
-            message.setText("你隻貓HP歸0\uD83D\uDC94，死左啦\uD83D\uDC80");
+            message.setText("你隻狗HP歸0\uD83D\uDC94，死左啦\uD83D\uDC80");
             dictionary.get(update.getMessage().getFrom().getId()).setDogAlive(false); //係update果度會DEL DATABASE
             try {
                 execute(message);
@@ -107,7 +120,7 @@ public class doggyBot extends TelegramLongPollingBot {
         message.setChatId(update.getMessage().getChatId());
 
         if (dictionary.get(update.getMessage().getFrom().getId()).getHunger() <= 0){
-            message.setText("你隻貓飢餓值歸0\uD83D\uDC94，死左啦\uD83D\uDC80");
+            message.setText("你隻狗飢餓值歸0\uD83D\uDC94，死左啦\uD83D\uDC80");
             dictionary.get(update.getMessage().getFrom().getId()).setDogAlive(false); //係update果度會DEL DATABASE
         }
     }
@@ -141,13 +154,47 @@ public class doggyBot extends TelegramLongPollingBot {
 
         if (dictionary.get(update.getMessage().getFrom().getId()).getExp()>= growCurve.get(dictionary.get(update.getMessage().getFrom().getId()).getLevel())){
             dictionary.get(update.getMessage().getFrom().getId()).setLevel(dictionary.get(update.getMessage().getFrom().getId()).getLevel() + 1);
-            message.setText("你隻貓Level Up⬆️\n佢而家係LV"+dictionary.get(update.getMessage().getFrom().getId()).getLevel()+
+            message.setText("你隻狗Level Up⬆️\n佢而家係LV"+dictionary.get(update.getMessage().getFrom().getId()).getLevel()+
                     "\n佢既最大生命值提升左"+ addHP(update)+"\uD83C\uDF89");
             dictionary.get(update.getMessage().getFrom().getId()).setMaximumHealth(dictionary.get(update.getMessage().getFrom().getId()).getMaximumHealth() + addHP(update));
             try {
                 execute(message);
             } catch (TelegramApiException e) {
                 e.printStackTrace();
+            }
+        }
+
+    }
+    public void checkAchievements(Update update){
+        int userID = 0;
+        SendMessage message = new SendMessage();
+        try {
+            message.setChatId(update.getMessage().getChatId());
+            userID = update.getMessage().getFrom().getId();
+        }catch (NullPointerException e){
+            message.setChatId(update.getCallbackQuery().getMessage().getChatId());
+            userID = update.getCallbackQuery().getFrom().getId();
+        }
+        if(!dictionary.get(userID).getAchievedAchievements().contains("愛狗之人")) {
+            if (dictionary.get(userID).getRelationship() >= 30) {
+                    dictionary.get(userID).getAchievedAchievements().add("愛狗之人");
+                    message.setText("\uD83C\uDF89\uD83C\uDF89你已解鎖成就\n「愛狗之人」");
+                try {
+                    execute(message);
+                } catch (TelegramApiException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        if(!dictionary.get(userID).getAchievedAchievements().contains("大富翁")) {
+            if (dictionary.get(userID).getCurrency() >= 2500) {
+                dictionary.get(userID).getAchievedAchievements().add("大富翁");
+                message.setText("\uD83C\uDF89\uD83C\uDF89你已解鎖成就\n「大富翁」");
+                try {
+                    execute(message);
+                } catch (TelegramApiException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -229,7 +276,6 @@ public class doggyBot extends TelegramLongPollingBot {
             if (win == 1) {
                 result += "\n佢打輸左比HTML怪物\uD83D\uDC7E\n生命\uD83D\uDC94減左"+loss;
                 dictionary.get(update.getMessage().getFrom().getId()).setHealth(dictionary.get(update.getMessage().getFrom().getId()).getHealth()-loss);
-                checkHPleft(update);
             }
         }
         if (randomStatement == 4){
@@ -263,7 +309,7 @@ public class doggyBot extends TelegramLongPollingBot {
             if (win == 1) {
                 result += "\n佢打輸左比CSS怪物\uD83D\uDC7E\n生命\uD83D\uDC94減左"+loss;
                 dictionary.get(update.getMessage().getFrom().getId()).setHealth(dictionary.get(update.getMessage().getFrom().getId()).getHealth()-loss);
-                checkHPleft(update);
+
             }
         }
         if (randomStatement == 8){
@@ -281,7 +327,6 @@ public class doggyBot extends TelegramLongPollingBot {
             if (win == 1) {
                 result += "\n佢打輸左比Javascript怪物\uD83D\uDC7E\n生命\uD83D\uDC94減左"+loss;
                 dictionary.get(update.getMessage().getFrom().getId()).setHealth(dictionary.get(update.getMessage().getFrom().getId()).getHealth()-loss);
-                checkHPleft(update);
             }
         }
         if (randomStatement == 9){
@@ -299,7 +344,6 @@ public class doggyBot extends TelegramLongPollingBot {
             if (win == 1) {
                 result += "\n佢打輸左比React怪物\uD83D\uDC7E\n生命\uD83D\uDC94減左"+loss;
                 dictionary.get(update.getMessage().getFrom().getId()).setHealth(dictionary.get(update.getMessage().getFrom().getId()).getHealth()-loss);
-                checkHPleft(update);
             }
         }
         if (randomStatement == 10){
@@ -313,7 +357,7 @@ public class doggyBot extends TelegramLongPollingBot {
         }
         if (randomStatement ==11){
             int cash = (int) (Math.random() * (50-1+1)+1);
-            result += "遇到一個陌生人塞錢比你\uD83C\uDF81\n";
+            result += "遇到一個陌生人塞錢比自己\uD83C\uDF81\n";
             result += "有$" +cash;
             dictionary.get(update.getMessage().getFrom().getId()).setCurrency(dictionary.get(update.getMessage().getFrom().getId()).getCurrency()+cash);
         }
@@ -327,7 +371,9 @@ public class doggyBot extends TelegramLongPollingBot {
     }
 
     public void onUpdateReceived(Update update) {
+        int userID = 0;
         if (update.hasMessage() && update.getMessage().hasText()) {
+            userID = update.getMessage().getFrom().getId();
             if (!dictionary.containsKey(update.getMessage().getFrom().getId())) { //如果無
                 dictionary.put(update.getMessage().getFrom().getId(), new Dog());
                 update.getMessage().getFrom().getId();
@@ -349,6 +395,7 @@ public class doggyBot extends TelegramLongPollingBot {
                     if (command.equals("/dog")) {
                         if (dictionary.get(update.getMessage().getFrom().getId()).getDogCounter() < 1) {
                             initalizeGrowCurve();
+                            initalizeTotalAchievements();
                             setGender(update);
                             message.setText("野生的" + dictionary.get(update.getMessage().getFrom().getId()).getSex() + "狗\uD83D\uDC15出現了\n輸入/name [名字]  去幫隻狗改名:\n ( e.g./name 阿旺)");
                             dictionary.get(update.getMessage().getFrom().getId()).setDogCounter(1);
@@ -407,7 +454,7 @@ public class doggyBot extends TelegramLongPollingBot {
                                         "\uD83D\uDCAA生命: " + dictionary.get(update.getMessage().getFrom().getId()).getHealth() +"/"+dictionary.get(update.getMessage().getFrom().getId()).getMaximumHealth()+ "\n" +
                                         "\uD83E\uDD47等級: "+  dictionary.get(update.getMessage().getFrom().getId()).getLevel() + "\n" +
                                         "\uD83C\uDD99經驗值: "  + dictionary.get(update.getMessage().getFrom().getId()).getExp() + "/" + growCurve.get(dictionary.get(update.getMessage().getFrom().getId()).getLevel()) +"exp\n" +
-                                        "\uD83C\uDF54飢餓值: " + dictionary.get(update.getMessage().getFrom().getId()).getHunger() + "\n" +
+                                        "\uD83C\uDF54飢餓值: " + dictionary.get(update.getMessage().getFrom().getId()).getHunger() + "/100\n" +
                                         "❤親密度: " + dictionary.get(update.getMessage().getFrom().getId()).getRelationship() + "\n" +
                                         "\uD83D\uDCB0金錢: " + dictionary.get(update.getMessage().getFrom().getId()).getCurrency());
                             } else {
@@ -425,26 +472,55 @@ public class doggyBot extends TelegramLongPollingBot {
                             e.printStackTrace();
                         }
                     }
+                    if (command.equals(("/achievements"))){
+                        String welcoming = "成就系統\n" +
+                                "你已達成"+dictionary.get(update.getMessage().getFrom().getId()).getAchievedAchievements().size()+"/"+totalAchievements.size()+"個成就\n\n";
+                        String printAll = "";
+                        for (String temp:totalAchievements.keySet()){
+                            for (String archievedTemp: dictionary.get(update.getMessage().getFrom().getId()).getAchievedAchievements())
+                                if (archievedTemp.equals(temp)){
+                                    printAll += "\uD83C\uDF1F「"+ temp +"」"+ "\n\t\t\t\t-"+ totalAchievements.get(temp)+"\n";
+                                }
+                        }
+                        message.setText(welcoming+printAll);
+                        try {
+                            execute(message);
+                        } catch (TelegramApiException e) {
+                            e.printStackTrace();
+                        }
+                    }
                     if (command.equals("/version")){
-                        message.setText("DoggyBot\uD83D\uDC36 簡介（5/11/2019）\n" +
+                        message.setText("小狗的RPG歷險記\uD83D\uDC36\n" +
+                                "V1.2.1更新(7/11/2019)\n" +
+                                "-修復大量文本錯誤\n" +
+                                "-更改遊戲平衡性\n" +
+                                "-測試成就系統\n" +
                                 "\n" +
-                                "V1.2更新(6/11/2019)\n" +
-                                "-新增等級系統\n" +
-                                "-增加更多探索選項\n" +
-                                "-更改餓死既時間\n\n" +
                                 "\uD83D\uDC36\uD83D\uDC36\uD83D\uDC36\uD83D\uDC36\uD83D\uDC36\uD83D\uDC36\uD83D\uDC36\uD83D\uDC36\uD83D\uDC36\uD83D\uDC36\uD83D\uDC36\uD83D\uDC36\uD83D\uDC36\uD83D\uDC36\n" +
                                 "更新預告\uD83D\uDD5B\n" +
-                                "\uD83C\uDF1FV1.3更新\n"+
+                                "\uD83C\uDF1FV1.3更新\n" +
+                                "-成就系統\n" +
+                                "-競技場系統\n" +
+                                "-完善的等級系統\n" +
+                                "\n" +
+                                "\uD83C\uDF1FV1.4更新\n" +
                                 "-新增好友系統\n" +
                                 "-新增物品庫\n" +
-                                "-新增送禮系統\n\n" +
-                                "🔙🔙🔙🔙🔙🔙🔙🔙🔙🔙🔙🔙🔙🔙\n" +
+                                "-新增送禮系統\n" +
+                                "\n" +
+                                "\uD83D\uDD19\uD83D\uDD19\uD83D\uDD19\uD83D\uDD19\uD83D\uDD19\uD83D\uDD19\uD83D\uDD19\uD83D\uDD19\uD83D\uDD19\uD83D\uDD19\uD83D\uDD19\uD83D\uDD19\uD83D\uDD19\uD83D\uDD19\n" +
                                 "舊版本資訊\n" +
+                                "\uD83C\uDF1FV1.2更新(6/11/2019)\n" +
+                                "-新增等級系統\n" +
+                                "-增加更多探索選項\n" +
+                                "-更改餓死既時間\n" +
+                                "\n" +
                                 "\uD83C\uDF1FV1.1更新(5/11/2019)\n" +
                                 "-飢餓值會隨時間而減\n" +
                                 "-每樣食物都有價錢，有錢先有得買\n" +
                                 "-解決狗仔全伺服器同步問題\n" +
-                                "\n\uD83C\uDF1FV1.0初行版(5/11/2019)\n"+
+                                "\n" +
+                                "\uD83C\uDF1FV1.0初行版(5/11/2019)\n" +
                                 "-可以養一隻屬於自己的狗仔\n" +
                                 "-可以同佢玩包剪揼\n" +
                                 "-可以叫佢出去探索世界\n" +
@@ -466,7 +542,7 @@ public class doggyBot extends TelegramLongPollingBot {
                                         "\uD83E\uDD69肉$40 飽食度:12 HP:+10\n" +
                                         "\uD83C\uDF6B朱古力$150 飽食度:30\n" +
                                         "\uD83C\uDF6D波棒糖$200 飽食度:30 HP:+25\n" +
-                                        "\uD83C\uDF6D生日蛋糕$600 飽食度:50 HP:完全恢復") ;
+                                        "\uD83C\uDF82生日蛋糕$600 飽食度:50 HP:完全恢復") ;
 
                                 InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
                                 List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
@@ -500,7 +576,7 @@ public class doggyBot extends TelegramLongPollingBot {
                     //當玩家輸入/kill
                     if (command.equals("/kill")) {
                         if (dictionary.get(update.getMessage().getFrom().getId()).getDogCounter() > 0) {
-                            message.setText("你係咪真係要殺我 QAQ?");
+                            message.setText("你係咪要火葬你隻狗 QAQ?");
                             InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
                             List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
                             List<InlineKeyboardButton> rowInline = new ArrayList<>();
@@ -553,7 +629,7 @@ public class doggyBot extends TelegramLongPollingBot {
                     //當玩家輸入/explore
                     if (command.equals("/explore")) {
                         String explore_msg = "";
-                        int[] seconds = {5, 10, 20};
+                        int[] seconds = {1, 1, 1};
                         int random = (int) (Math.random() * (2 - 0 + 1) + 0);
                         System.out.println("random: " + random);
                         if (dictionary.get(update.getMessage().getFrom().getId()).getDogCounter() > 0) {
@@ -654,7 +730,7 @@ public class doggyBot extends TelegramLongPollingBot {
                 String command = update.getMessage().getText();
                 SendMessage message = new SendMessage();
                 message.setChatId(update.getMessage().getChatId());
-                message.setText("\uD83D\uDC3E" + dictionary.get(update.getMessage().getFrom().getId()).getName() + "你隻貓死左啦\uD83D\uDC80");
+                message.setText("\uD83D\uDC3E" + dictionary.get(update.getMessage().getFrom().getId()).getName() + "你隻狗死左啦\uD83D\uDC80");
                 dictionary.remove(update.getMessage().getFrom().getId());
                 //removeAllData();
                 try {
@@ -665,6 +741,7 @@ public class doggyBot extends TelegramLongPollingBot {
             }
         } else if (update.hasCallbackQuery()) {
                 // Set variables
+                userID = update.getCallbackQuery().getFrom().getId();
                 String call_data = update.getCallbackQuery().getData();
                 long message_id = update.getCallbackQuery().getMessage().getMessageId();
                 long chat_id = update.getCallbackQuery().getMessage().getChatId();
@@ -702,7 +779,7 @@ public class doggyBot extends TelegramLongPollingBot {
             if (call_data.equals("food_chicken")) {
                 if (!(dictionary.get(update.getCallbackQuery().getFrom().getId()).getHunger() + 15 > 100)) {
                     if (dictionary.get(update.getCallbackQuery().getFrom().getId()).getCurrency() >= 23) {
-                        new_message.setText("用$40餵左雞肉串\n飢餓值增加左: 12");
+                        new_message.setText("用$40餵左雞肉串\n飢餓值增加左: 15");
                         dictionary.get(update.getCallbackQuery().getFrom().getId()).setHunger(dictionary.get(update.getCallbackQuery().getFrom().getId()).getHunger() + 15);
                         dictionary.get(update.getCallbackQuery().getFrom().getId()).setCurrency(dictionary.get(update.getCallbackQuery().getFrom().getId()).getCurrency() - 23);
                     } else {
@@ -766,10 +843,10 @@ public class doggyBot extends TelegramLongPollingBot {
             }
 
             if (call_data.equals("food_birthdaycake")) {
-                if (!(dictionary.get(update.getCallbackQuery().getFrom().getId()).getHunger() + 50 > 100)) {
+                if (!(dictionary.get(update.getCallbackQuery().getFrom().getId()).getHunger() + 75 > 100)) {
                     if (dictionary.get(update.getCallbackQuery().getFrom().getId()).getCurrency() >= 600) {
-                        new_message.setText("用$600餵左生日蛋糕\n飢餓值增加左: 50\nHP完全恢復");
-                        dictionary.get(update.getCallbackQuery().getFrom().getId()).setHunger(dictionary.get(update.getCallbackQuery().getFrom().getId()).getHunger() + 50);
+                        new_message.setText("用$600餵左生日蛋糕\n飢餓值增加左: 75\nHP完全恢復");
+                        dictionary.get(update.getCallbackQuery().getFrom().getId()).setHunger(dictionary.get(update.getCallbackQuery().getFrom().getId()).getHunger() + 75);
                         dictionary.get(update.getCallbackQuery().getFrom().getId()).setCurrency(dictionary.get(update.getCallbackQuery().getFrom().getId()).getCurrency() - 600);
                         dictionary.get(update.getCallbackQuery().getFrom().getId()).setHealth(dictionary.get(update.getCallbackQuery().getFrom().getId()).getMaximumHealth()); //set最大生命值
 
@@ -780,7 +857,7 @@ public class doggyBot extends TelegramLongPollingBot {
                     new_message.setText("\uD83D\uDC3E" + dictionary.get(update.getCallbackQuery().getFrom().getId()).getName() + "會飽到死嫁");
                 }
             }
-                //如果玩家決定殺貓
+                //如果玩家決定殺狗
                 if (call_data.equals("kill_yes")) {
                     new_message.setText("\uD83D\uDC3E" + dictionary.get(update.getCallbackQuery().getFrom().getId()).getName() + "已經前往西天了\uD83D\uDC80 R.I.P.");
                     dictionary.remove(update.getCallbackQuery().getFrom().getId());
@@ -789,7 +866,7 @@ public class doggyBot extends TelegramLongPollingBot {
                     }
                     System.out.println("Print Complete");
                 }
-                //如果玩家唔殺貓
+                //如果玩家唔殺狗
                 if (call_data.equals("kill_no")) {
                     new_message.setText("多謝你唔殺我\uD83D\uDE2D\uD83D\uDE2D\uD83D\uDE2D");
                 }
@@ -800,9 +877,9 @@ public class doggyBot extends TelegramLongPollingBot {
                     List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
                     List<InlineKeyboardButton> rowInline = new ArrayList<>();
                     List<InlineKeyboardButton> rowInline1 = new ArrayList<>();
-                    rowInline.add(new InlineKeyboardButton().setText("1\uD83D\uDD90包").setCallbackData("paper"));
-                    rowInline.add(new InlineKeyboardButton().setText("2✌剪").setCallbackData("scissors"));
-                    rowInline.add(new InlineKeyboardButton().setText("3\uD83D\uDC4A揼").setCallbackData("stone"));
+                    rowInline.add(new InlineKeyboardButton().setText("\uD83D\uDD90包").setCallbackData("paper"));
+                    rowInline.add(new InlineKeyboardButton().setText("✌剪").setCallbackData("scissors"));
+                    rowInline.add(new InlineKeyboardButton().setText("\uD83D\uDC4A揼").setCallbackData("stone"));
 
                     // Set the keyboard to the markup
                     rowsInline.add(rowInline);
@@ -839,7 +916,8 @@ public class doggyBot extends TelegramLongPollingBot {
                     e.printStackTrace();
                 }
             }
-
+               // checkHPleft(update);
+               checkAchievements(update);
         }
 
 
@@ -853,6 +931,8 @@ public class doggyBot extends TelegramLongPollingBot {
     @Override
     public String getBotToken() {
         // TODO
-        return "123";
+        return "844161272:AAFSfCUKlWHCukJhjAjzjDze577oYcvdj3k";
+        //Online :"844161272:AAFSfCUKlWHCukJhjAjzjDze577oYcvdj3k";
+        //Test   :"1032223034:AAFcHuiTtpTcB2_9jpMw9V-TGbhsfHC-RuY";
     }
 }

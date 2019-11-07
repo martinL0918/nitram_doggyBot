@@ -1,4 +1,6 @@
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Timer;
 
 public class Dog {
@@ -25,6 +27,8 @@ public class Dog {
     private boolean toggle_settingCurrency;
     private int level;
     private int exp;
+    private Set<String> achievedAchievements = new HashSet<>();
+    private boolean isCallBackQuery  = false ;
 
 
     public Timer getHungerTimer() {
@@ -36,7 +40,7 @@ public class Dog {
     }
 
     public Dog() {
-        this.health = 30;
+        this.health = 1;
         this.maximumHealth = 30;
         this.hunger = 50;
         //this.current = current;
@@ -242,5 +246,21 @@ public class Dog {
 
     public void setExp(int exp) {
         this.exp = exp;
+    }
+
+    public Set<String> getAchievedAchievements() {
+        return achievedAchievements;
+    }
+
+    public void setAchievedAchievements(Set<String> achievedAchievements) {
+        this.achievedAchievements = achievedAchievements;
+    }
+
+    public boolean isCallBackQuery() {
+        return isCallBackQuery;
+    }
+
+    public void setCallBackQuery(boolean callBackQuery) {
+        isCallBackQuery = callBackQuery;
     }
 }
