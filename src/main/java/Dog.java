@@ -25,10 +25,13 @@ public class Dog {
     private boolean running;
     private boolean toggle_settingRelationship;
     private boolean toggle_settingCurrency;
+    private boolean toggle_settingLevel;
     private int level;
     private int exp;
     private Set<String> achievedAchievements = new HashSet<>();
-    private boolean isCallBackQuery  = false ;
+    private boolean inArena = false;
+    private int arenaCounter = 0 ;
+    private HashMap<String,Integer> inventory = new HashMap<>();
 
 
     public Timer getHungerTimer() {
@@ -224,6 +227,14 @@ public class Dog {
         this.toggle_settingCurrency = toggle_settingCurrency;
     }
 
+    public boolean isToggle_settingLevel() {
+        return toggle_settingLevel;
+    }
+
+    public void setToggle_settingLevel(boolean toggle_settingLevel) {
+        this.toggle_settingLevel = toggle_settingLevel;
+    }
+
     public int getMaximumHealth() {
         return maximumHealth;
     }
@@ -256,11 +267,27 @@ public class Dog {
         this.achievedAchievements = achievedAchievements;
     }
 
-    public boolean isCallBackQuery() {
-        return isCallBackQuery;
+    public boolean isInArena() {
+        return inArena;
     }
 
-    public void setCallBackQuery(boolean callBackQuery) {
-        isCallBackQuery = callBackQuery;
+    public void setInArena(boolean inArena) {
+        this.inArena = inArena;
+    }
+
+    public int getArenaCounter() {
+        return arenaCounter;
+    }
+
+    public void setArenaCounter(int arenaCounter) {
+        this.arenaCounter = arenaCounter;
+    }
+
+    public HashMap<String, Integer> getInventory() {
+        return inventory;
+    }
+
+    public void setInventory(HashMap<String, Integer> inventory) {
+        this.inventory = inventory;
     }
 }
