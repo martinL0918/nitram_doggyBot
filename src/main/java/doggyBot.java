@@ -964,7 +964,6 @@ public class doggyBot extends TelegramLongPollingBot {
                                 "更新預告\uD83D\uDD5B\n" +
                                 "\uD83C\uDF1FV1.5更新\n" +
                                 "-新增好友系統\n" +
-                                "-新增物品庫\n" +
                                 "-新增送禮系統\n" +
                                 "\n" +
                                 "\uD83D\uDD19\uD83D\uDD19\uD83D\uDD19\uD83D\uDD19\uD83D\uDD19\uD83D\uDD19\uD83D\uDD19\uD83D\uDD19\uD83D\uDD19\uD83D\uDD19\uD83D\uDD19\uD83D\uDD19\uD83D\uDD19\uD83D\uDD19\n" +
