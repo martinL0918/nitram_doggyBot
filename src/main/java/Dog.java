@@ -38,7 +38,7 @@ public class Dog {
     private int level_achievement = 0;
     private int asset_achievement = 0;
     private int arena_achievement = 0;
-    private int friends_achievement =9;
+    private int friends_achievement =0;
 
 
 
