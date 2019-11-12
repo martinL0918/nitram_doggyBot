@@ -1,7 +1,4 @@
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Timer;
+import java.util.*;
 
 public class Dog {
     private int health;
@@ -32,6 +29,17 @@ public class Dog {
     private boolean inArena = false;
     private int arenaCounter = 0 ;
     private HashMap<String,Integer> inventory = new HashMap<>();
+    private HashMap<String,Integer> giftInventory = new HashMap<>();
+    private HashMap<String, Integer> foundFriends= new HashMap<>();
+    private String friendsPointer;
+    private int arenaWinCounter =0;
+    private int relationship_achievement = 0;
+    private int command_achievement = 0;
+    private int level_achievement = 0;
+    private int asset_achievement = 0;
+    private int arena_achievement = 0;
+    private int friends_achievement =9;
+
 
 
     public Timer getHungerTimer() {
@@ -68,6 +76,7 @@ public class Dog {
         this.toggle_settingCurrency = false;
         this.level = 1;
         this.exp = 1;
+        this.friendsPointer = "";
     }
 
 
@@ -289,5 +298,85 @@ public class Dog {
 
     public void setInventory(HashMap<String, Integer> inventory) {
         this.inventory = inventory;
+    }
+
+    public HashMap<String, Integer> getFoundFriends() {
+        return foundFriends;
+    }
+
+    public void setFoundFriends(HashMap<String, Integer> foundFriends) {
+        this.foundFriends = foundFriends;
+    }
+
+    public HashMap<String, Integer> getGiftInventory() {
+        return giftInventory;
+    }
+
+    public void setGiftInventory(HashMap<String, Integer> giftInventory) {
+        this.giftInventory = giftInventory;
+    }
+
+    public String getFriendsPointer() {
+        return friendsPointer;
+    }
+
+    public void setFriendsPointer(String friendsPointer) {
+        this.friendsPointer = friendsPointer;
+    }
+
+    public int getArenaWinCounter() {
+        return arenaWinCounter;
+    }
+
+    public void setArenaWinCounter(int arenaWinCounter) {
+        this.arenaWinCounter = arenaWinCounter;
+    }
+
+    public int getRelationship_achievement() {
+        return relationship_achievement;
+    }
+
+    public void setRelationship_achievement(int relationship_achievement) {
+        this.relationship_achievement = relationship_achievement;
+    }
+
+    public int getCommand_achievement() {
+        return command_achievement;
+    }
+
+    public void setCommand_achievement(int command_achievement) {
+        this.command_achievement = command_achievement;
+    }
+
+    public int getLevel_achievement() {
+        return level_achievement;
+    }
+
+    public void setLevel_achievement(int level_achievement) {
+        this.level_achievement = level_achievement;
+    }
+
+    public int getAsset_achievement() {
+        return asset_achievement;
+    }
+
+    public void setAsset_achievement(int asset_achievement) {
+        this.asset_achievement = asset_achievement;
+    }
+
+    public int getArena_achievement() {
+        return arena_achievement;
+    }
+
+    public void setArena_achievement(int arena_achievement) {
+        this.arena_achievement = arena_achievement;
+    }
+
+    public int getFriends_achievement() {
+        return friends_achievement;
+    }
+
+    public void setFriends_achievement(int friends_achievement) {
+        this.friends_achievement = friends_achievement;
     }
 }
