@@ -98,7 +98,7 @@ public class doggyBot extends TelegramLongPollingBot {
             @Override
             public void run() {
                 dictionary.get(update.getMessage().getFrom().getId()).setExploring(false);
-                System.out.println(dictionary.get(update.getMessage().getFrom().getId()) + ":" + dictionary.get(update.getMessage().getFrom().getId()).isExploring());
+                //System.out.println(dictionary.get(update.getMessage().getFrom().getId()) + ":" + dictionary.get(update.getMessage().getFrom().getId()).isExploring());
                 String explore_msg ="";
                 explore_msg = exploreTheWorld(update);
                 SendMessage message = new SendMessage();
@@ -571,7 +571,6 @@ public class doggyBot extends TelegramLongPollingBot {
         String result = "";
         int relation = (int) (Math.random() * ( 2-1 + 1)+ 1);
         int computer = (int) (Math.random() * (2 - 0 + 1) + 0);
-        System.out.println(computer);
         if (computer == 0) {//粒鑽石係左邊i
             result = "\uD83D\uDC8E\t\uD83E\uDDF3\t\uD83E\uDDF3\n";
             if(input==1){
@@ -840,7 +839,6 @@ public class doggyBot extends TelegramLongPollingBot {
         if (randomStatement == 1) {
             int cash = (int) (Math.random() * (80 - 30 + 1) + 30);
             int loss = (int) (Math.random() * (10 - 1 + 1) + 1);
-            System.out.println("怪物基本傷害係"+ loss);
             int loss1 = levelUpDMG(update, loss);
             int exp = (int) (Math.random() * (12 - 1 + 1) + 1) * dictionary.get(update.getMessage().getFrom().getId()).getLevel();
             result += "遇到BOSS-穿著博士袍的黃色章魚老師\uD83D\uDC7E\n";
@@ -860,7 +858,6 @@ public class doggyBot extends TelegramLongPollingBot {
             int cash = (int) (Math.random() * (80 - 30 + 1) + 30);
             int win = (int) (Math.random() * (1 - 0 + 1) + 0);
             int loss = (int) (Math.random() * (10 - 1 + 1) + 1);
-            System.out.println("怪物基本傷害係"+ loss);
             int loss1 = levelUpDMG(update, loss);
             int exp = (int) (Math.random() * (12 - 1 + 1) + 1) * dictionary.get(update.getMessage().getFrom().getId()).getLevel();
             result += "遇到HTML怪物\uD83D\uDC7E\n";
@@ -897,7 +894,6 @@ public class doggyBot extends TelegramLongPollingBot {
                 result += "佢叫做" + allFreinds[random];
                 dictionary.get(update.getMessage().getFrom().getId()).getFoundFriends().put(allFreinds[random], 0);
             }
-            System.out.println("遇到朋友: " + allFreinds[random]);
             //result +="心靈❤️富足比金錢\uD83D\uDCB5重要";
         }
         if (randomStatement == 6) {
@@ -907,7 +903,6 @@ public class doggyBot extends TelegramLongPollingBot {
             int cash = (int) (Math.random() * (80 - 30 + 1) + 30);
             int win = (int) (Math.random() * (1 - 0 + 1) + 0);
             int loss = (int) (Math.random() * (10 - 1 + 1) + 1);
-            System.out.println("怪物基本傷害係"+ loss);
             int loss1 = levelUpDMG(update, loss);
             int exp = (int) (Math.random() * (12 - 1 + 1) + 1) * dictionary.get(update.getMessage().getFrom().getId()).getLevel();
             result += "遇到CSS怪物\uD83D\uDC7E\n";
@@ -927,7 +922,6 @@ public class doggyBot extends TelegramLongPollingBot {
             int cash = (int) (Math.random() * (80 - 30 + 1) + 30);
             int win = (int) (Math.random() * (1 - 0 + 1) + 0);
             int loss = (int) (Math.random() * (10 - 1 + 1) + 1);
-            System.out.println("怪物基本傷害係"+ loss);
             int loss1 = levelUpDMG(update, loss);
             int exp = (int) (Math.random() * (12 - 1 + 1) + 1) * dictionary.get(update.getMessage().getFrom().getId()).getLevel();
             result += "遇到Javascript怪物\uD83D\uDC7E\n";
@@ -946,7 +940,6 @@ public class doggyBot extends TelegramLongPollingBot {
             int cash = (int) (Math.random() * (80 - 30 + 1) + 30);
             int win = (int) (Math.random() * (1 - 0 + 1) + 0);
             int loss = (int) (Math.random() * (10 - 1 + 1) + 1);
-            System.out.println("怪物基本傷害係"+ loss);
             int loss1 = levelUpDMG(update, loss);
             int exp = (int) (Math.random() * (12 - 1 + 1) + 1) * dictionary.get(update.getMessage().getFrom().getId()).getLevel();
             result += "遇到React怪物\uD83D\uDC7E\n";
@@ -1135,11 +1128,11 @@ public class doggyBot extends TelegramLongPollingBot {
                                 String welcoming = "✨成就系統\n\n" +
                                         "你已達成" + dictionary.get(update.getMessage().getFrom().getId()).getAchievedAchievements().size() + "/" + totalAchievements.size() + "個成就，其中:\n" +
                                         "\t\t\t親密度系:\t\t"+ dictionary.get(update.getMessage().getFrom().getId()).getRelationship_achievement() +"/3個\n"+
-                                        "\t\t\t指令系:\t\t\t\t\t\t"+ dictionary.get(update.getMessage().getFrom().getId()).getRelationship_achievement() +"/2個\n"+
-                                        "\t\t\t等級系:\t\t\t\t\t\t"+ dictionary.get(update.getMessage().getFrom().getId()).getRelationship_achievement() +"/3個\n"+
-                                        "\t\t\t財產系:\t\t\t\t\t\t"+ dictionary.get(update.getMessage().getFrom().getId()).getRelationship_achievement() +"/3個\n"+
-                                        "\t\t\t競技埸系:\t\t"+ dictionary.get(update.getMessage().getFrom().getId()).getRelationship_achievement() +"/2個\n"+
-                                        "\t\t\t好友系:\t\t\t\t\t\t"+ dictionary.get(update.getMessage().getFrom().getId()).getRelationship_achievement() +"/8個\n\n\n";
+                                        "\t\t\t指令系:\t\t\t\t\t\t"+ dictionary.get(update.getMessage().getFrom().getId()).getCommand_achievement() +"/2個\n"+
+                                        "\t\t\t等級系:\t\t\t\t\t\t"+ dictionary.get(update.getMessage().getFrom().getId()).getLevel_achievement() +"/3個\n"+
+                                        "\t\t\t財產系:\t\t\t\t\t\t"+ dictionary.get(update.getMessage().getFrom().getId()).getAsset_achievement() +"/3個\n"+
+                                        "\t\t\t競技埸系:\t\t"+ dictionary.get(update.getMessage().getFrom().getId()).getArena_achievement() +"/2個\n"+
+                                        "\t\t\t好友系:\t\t\t\t\t\t"+ dictionary.get(update.getMessage().getFrom().getId()).getFriends_achievement() +"/8個\n\n\n";
                                 String printAll = "";
                                 for (String temp : totalAchievements.keySet()) {
                                     for (String archievedTemp : dictionary.get(update.getMessage().getFrom().getId()).getAchievedAchievements()) {
@@ -1958,10 +1951,6 @@ public class doggyBot extends TelegramLongPollingBot {
             if (call_data.equals("kill_yes")) {
                 new_message.setText("\uD83D\uDC3E" + dictionary.get(update.getCallbackQuery().getFrom().getId()).getName() + "已經前往西天了\uD83D\uDC80 R.I.P.");
                 dictionary.remove(update.getCallbackQuery().getFrom().getId());
-                for (int temp : dictionary.keySet()) {
-                    System.out.println(temp);
-                }
-                System.out.println("Print Complete");
             }
             //如果玩家唔殺狗
             if (call_data.equals("kill_no")) {
@@ -1996,7 +1985,6 @@ public class doggyBot extends TelegramLongPollingBot {
                 for (String temp : dictionary.get(update.getCallbackQuery().getFrom().getId()).getFoundFriends().keySet()) {
                     result += temp + ":\n";
                     result += "\t\t\t\uD83D\uDC97目前親密度: " + dictionary.get(update.getCallbackQuery().getFrom().getId()).getFoundFriends().get(temp) + "\n";
-                    System.out.println("Counter:" + counter);
                     if (counter <= 3) {
                         rowInline.add(new InlineKeyboardButton().setText(temp).setCallbackData("friends_" + temp));
                     } else if (counter <= 6) {
@@ -2436,7 +2424,8 @@ public class doggyBot extends TelegramLongPollingBot {
     public String getBotToken() {
         // TODO
         return "844161272:AAFSfCUKlWHCukJhjAjzjDze577oYcvdj3k";
-        //Online :"844161272:AAFSfCUKlWHCukJhjAjzjDze577oYcvdj3k";
-        //Test   :"1032223034:AAFcHuiTtpTcB2_9jpMw9V-TGbhsfHC-RuY";
+    //Online :"844161272:AAFSfCUKlWHCukJhjAjzjDze577oYcvdj3k";
+    //Test   :"1032223034:AAFcHuiTtpTcB2_9jpMw9V-TGbhsfHC-RuY";
+
     }
 }
