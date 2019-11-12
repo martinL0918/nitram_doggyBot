@@ -116,7 +116,7 @@ public class doggyBot extends TelegramLongPollingBot {
                 } catch (NullPointerException e) {
                 }
             }
-        }, seconds * 1000); //?60?-1???
+        }, seconds * 1000);
     }
     public void setHungerTimer(Update update) {
         dictionary.get(update.getMessage().getFrom().getId()).getHungerTimer().scheduleAtFixedRate(new TimerTask() {
@@ -168,6 +168,7 @@ public class doggyBot extends TelegramLongPollingBot {
         message.setChatId(update.getMessage().getChatId());
         if (hp <=0){
             message.setText("你隻狗HP歸0\uD83D\uDC94，死左啦\uD83D\uDC80");
+            dictionary.get(update.getMessage().getFrom().getId()).setDogCounter(0);
             dictionary.get(update.getMessage().getFrom().getId()).setDogAlive(false); //係update果度會DEL DATABASE
             try {
                 execute(message);
@@ -186,6 +187,12 @@ public class doggyBot extends TelegramLongPollingBot {
             message.setText("你隻狗飢餓值歸0\uD83D\uDC94，死左啦\uD83D\uDC80");
             dictionary.get(update.getMessage().getFrom().getId()).setDogAlive(false); //係update果度會DEL DATABASE
         }
+    }
+    public boolean checkArenaDead(Update update){
+        if (dictionary.get(update.getMessage().getFrom().getId()).getHunger() <= 5){
+            return true;
+        }
+        return false;
     }
     public int addHP(Update update){
         int currentLevel = dictionary.get(update.getMessage().getFrom().getId()).getLevel();
@@ -414,7 +421,7 @@ public class doggyBot extends TelegramLongPollingBot {
                 }
             }
             if(!dictionary.get(userID).getAchievedAchievements().contains("長勝將軍")) {
-                if (dictionary.get(userID).getArenaWinCounter() == 10) {
+                if (dictionary.get(userID).getArenaWinCounter() >= 10) {
                     dictionary.get(userID).getAchievedAchievements().add("長勝將軍");
                     message.setText("\uD83C\uDF89\uD83C\uDF89你已解鎖成就\n「長勝將軍」");
                     dictionary.get(update.getMessage().getFrom().getId()).setArena_achievement(dictionary.get(update.getMessage().getFrom().getId()).getArena_achievement() + 1);
@@ -616,218 +623,222 @@ public class doggyBot extends TelegramLongPollingBot {
         int arenaHealth = dictionary.get(update.getCallbackQuery().getFrom().getId()).getHealth();
         int arenaMaxHealth = dictionary.get(update.getCallbackQuery().getFrom().getId()).getMaximumHealth();
         String petName = dictionary.get(update.getCallbackQuery().getFrom().getId()).getName();
+            if (computer == 0) {//電腦係快攻手
+                if (input == 0) {//快攻手
+                    result += "\uD83D\uDC36" + petName + "使用(快攻)風格戰鬥⚔️\n\n";
+                    if (win == 0) {
+                        result += petName + "遇到(快攻手)佛山無影腳- 杰克\n\t\t🗡️" +
+                                petName + "開始同杰克展開生死對決\n\t\t🗡️" +
+                                petName + "一野咬落杰克到" +
+                                "\t\t🗡️️杰克都不甘視弱,使出佛山無影腳\n\t\t🗡️" +
+                                petName + "中左七七四十九腳\n\t\t🗡️" +
+                                petName + "\t\t不幸戰敗\n\n";
+                        result += petName + "損失左$" + loseMoney + "💸\n";
+                        dictionary.get(update.getCallbackQuery().getFrom().getId()).setCurrency(dictionary.get(update.getCallbackQuery().getFrom().getId()).getCurrency() - loseMoney);
+                        if (arenaHealth > 10) {
+                            result += petName + "只係得翻50%血量💔\n";
+                            dictionary.get(update.getCallbackQuery().getFrom().getId()).setHealth((int) Math.round(dictionary.get(update.getCallbackQuery().getFrom().getId()).getHealth() * 0.5));
+                        } else {
+                            result += "\n因為你賭命\n" + petName + "已經死左💀";
+                            dictionary.get(update.getCallbackQuery().getFrom().getId()).setDogAlive(false);
+                        }
+                    }
+                    if (win == 1) {
+                        result += petName + "遇到(快攻手)佛山無影腳- 杰克\n" +
+                                petName + "開始同杰克展開生死對決\n\t\t🗡️" +
+                                petName + "一野咬落杰克到\n" +
+                                "\t\t🗡️️杰克都不甘視弱,使出佛山無影腳\n\t\t🗡️" +
+                                petName + "使出電光石火，衝去杰克\n" +
+                                "\t\t🗡️️佢一野咬住杰克既腳令到佢出唔到招\n\t\t🗡️" +
+                                petName + "乘勝狙擊,成功打敗左仔杰克\n\n";
+                        result += petName + "獲得$" + winMoney + "✔️勝利獎勵";
+                        dictionary.get(update.getCallbackQuery().getFrom().getId()).setArenaWinCounter(dictionary.get(update.getCallbackQuery().getFrom().getId()).getArenaWinCounter() + 1);
+                        dictionary.get(update.getCallbackQuery().getFrom().getId()).setCurrency(dictionary.get(update.getCallbackQuery().getFrom().getId()).getCurrency() + winMoney);
+                    }
 
-        if (computer == 0) {//電腦係快攻手
-            if (input == 0) {//快攻手
-                result += "\uD83D\uDC36" +petName + "使用(快攻)風格戰鬥⚔️\n\n";
-                if (win == 0) {
-                    result +=  petName + "遇到(快攻手)佛山無影腳- 杰克\n\t\t🗡️" +
-                             petName + "開始同杰克展開生死對決\n\t\t🗡️" +
-                             petName + "一野咬落杰克到" +
-                            "\t\t🗡️️杰克都不甘視弱,使出佛山無影腳\n\t\t🗡️" +
-                             petName + "中左7749腳\n\t\t🗡️" +
-                             petName + "\t\t不幸戰敗\n\n";
-                    result +=  petName + "損失左$" + loseMoney + "💸\n";
+                } else if (input == 1) {//狗係重攻擊
+                    result += "\uD83D\uDC36" + petName + "使用(重攻擊)風格戰鬥⚔️\n\n";
+                    result += petName + "遇到(快攻手)佛山無影腳- 杰克\n" +
+                            petName + "開始同杰克展開生死對決\n\t\t🗡️" +
+                            petName + "原地不動，係度蓄力儲氣,希望可以一野打低杰克\n" +
+                            "\t\t🗡️️杰克看見機不可失，即刻衝上前\n" +
+                            "\t\t🗡️️杰克以" + petName + "為中心，不斷使出回旋斬\n\t\t🗡️" +
+                            petName + "的攻擊不單止打唔中杰克，仲比佢斬左幾百刀\n\t\t🗡️" +
+                            petName + "戰敗\n\n";
+                    result += petName + "損失左$" + loseMoney + "💸\n";
                     dictionary.get(update.getCallbackQuery().getFrom().getId()).setCurrency(dictionary.get(update.getCallbackQuery().getFrom().getId()).getCurrency() - loseMoney);
                     if (arenaHealth > 10) {
-                        result +=  petName + "只係得翻50%血量💔\n";
+                        result += petName + "只係得翻50%血量💔\n";
                         dictionary.get(update.getCallbackQuery().getFrom().getId()).setHealth((int) Math.round(dictionary.get(update.getCallbackQuery().getFrom().getId()).getHealth() * 0.5));
                     } else {
                         result += "\n因為你賭命\n" + petName + "已經死左💀";
                         dictionary.get(update.getCallbackQuery().getFrom().getId()).setDogAlive(false);
                     }
-                }
-                if (win == 1) {
-                    result +=  petName + "遇到(快攻手)佛山無影腳- 杰克\n" +
-                             petName + "開始同杰克展開生死對決\n\t\t🗡️" +
-                             petName + "一野咬落杰克到\n" +
-                            "\t\t🗡️️杰克都不甘視弱,使出佛山無影腳\n\t\t🗡️" +
-                             petName + "使出電光石火，衝去杰克\n" +
-                            "\t\t🗡️️佢一野咬住杰克既腳令到佢出唔到招\n\t\t🗡️" +
-                            petName + "乘勝狙擊,成功打敗左仔杰克\n\n";
-                    result +=  petName + "獲得$" + winMoney + "✔️勝利獎勵";
+                } else {//狗係防禦型
+                    result += "\uD83D\uDC36" + petName + "使用(防禦)風格戰鬥⚔️\n\n";
+                    result += petName + "遇到(快攻手)佛山無影腳- 杰克\n" +
+                            petName + "開始同杰克展開生死對決\n\t\t🗡️" +
+                            petName + "原地不動擺出防禦架勢\n" +
+                            "\t\t🗡️️杰克拎起武器即刻衝上前,不斷對" + petName + "使出快刺\n\t\t🗡️" +
+                            petName + "中左幾百劍\n" +
+                            "\t\t🗡️️但" + petName + "竟然絲毫無損\n" +
+                            "\t\t🗡️️係呢個時候，杰克已經體力不支\n\t\t🗡️" +
+                            petName + "把握機會使出重擊，成功打敗左杰克\n\n";
+                    result += petName + "獲得$" + winMoney + "✔️勝利獎勵";
+                    dictionary.get(update.getCallbackQuery().getFrom().getId()).setArenaWinCounter(dictionary.get(update.getCallbackQuery().getFrom().getId()).getArenaWinCounter() + 1);
                     dictionary.get(update.getCallbackQuery().getFrom().getId()).setCurrency(dictionary.get(update.getCallbackQuery().getFrom().getId()).getCurrency() + winMoney);
                 }
-
-            } else if (input == 1) {//狗係重攻擊
-                result += "\uD83D\uDC36" +petName + "使用(重攻擊)風格戰鬥⚔️\n\n";
-                result += petName + "遇到(快攻手)佛山無影腳- 杰克\n" +
-                         petName + "開始同杰克展開生死對決\n\t\t🗡️" +
-                          petName + "原地不動，係度蓄力儲氣,希望可以一野打低杰克\n" +
-                        "\t\t🗡️️杰克看見機不可失，即刻衝上前\n" +
-                        "\t\t🗡️️杰克以" +  petName + "為中心，不斷使出回旋斬\n\t\t🗡️" +
-                         petName + "的攻擊不單止打唔中杰克，仲比佢斬左幾百刀\n\t\t🗡️" +
-                         petName + "戰敗\n\n";
-                result +=  petName + "損失左$" + loseMoney + "💸\n";
-                dictionary.get(update.getCallbackQuery().getFrom().getId()).setCurrency(dictionary.get(update.getCallbackQuery().getFrom().getId()).getCurrency() - loseMoney);
-                if (arenaHealth > 10) {
-                    result +=  petName + "只係得翻50%血量💔\n";
-                    dictionary.get(update.getCallbackQuery().getFrom().getId()).setHealth((int) Math.round(dictionary.get(update.getCallbackQuery().getFrom().getId()).getHealth() * 0.5));
-                } else {
-                    result += "\n因為你賭命\n" +  petName + "已經死左💀";
-                    dictionary.get(update.getCallbackQuery().getFrom().getId()).setDogAlive(false);
-                }
-            } else {//狗係防禦型
-                result += "\uD83D\uDC36" +petName + "使用(防禦)風格戰鬥⚔️\n\n";
-                result +=  petName + "遇到(快攻手)佛山無影腳- 杰克\n" +
-                         petName + "開始同杰克展開生死對決\n\t\t🗡️" +
-                         petName + "原地不動擺出防禦架勢\n" +
-                        "\t\t🗡️️杰克拎起武器即刻衝上前,不斷對" +  petName + "使出快刺\n\t\t🗡️" +
-                          petName + "中左幾百劍\n" +
-                        "\t\t🗡️️但" +  petName + "竟然絲毫無損\n" +
-                        "\t\t🗡️️係呢個時候，杰克已經體力不支\n\t\t🗡️" +
-                         petName + "把握機會使出重擊，成功打敗左杰克\n\n";
-                result +=  petName + "獲得$" + winMoney + "✔️勝利獎勵";
-                dictionary.get(update.getCallbackQuery().getFrom().getId()).setCurrency(dictionary.get(update.getCallbackQuery().getFrom().getId()).getCurrency() + winMoney);
             }
-        }
-        if (computer == 1) {//電腦係重戰士
-            if (input == 1) {//狗係重攻擊
-                result += "\uD83D\uDC36" +petName + "使用(重攻擊)風格戰鬥⚔️\n\n";
-                if (win == 0) {
-                    result +=  petName + "遇到(重戰士)生死一擊- 海道\n" +
-                             petName + "開始同海道展開生死對決\n\t\t🗡️" +
-                             petName + "使出吃奶之力，一野撞埋海道度\n" +
-                            "\t\t🗡️️海道都不甘視弱,拿出巨大斧頭，向下一劈\n\t\t🗡️" +
-                             petName + "背部受重創\n\t\t🗡️" +
-                            "不幸戰敗\n\n";
-                    result +=  petName + "損失左$" + loseMoney + "💸\n";
-                    dictionary.get(update.getCallbackQuery().getFrom().getId()).setCurrency(dictionary.get(update.getCallbackQuery().getFrom().getId()).getCurrency() - loseMoney);
-                    if (arenaHealth > 10) {
-                        result +=  petName + "只係得翻50%血量💔\n";
-                        dictionary.get(update.getCallbackQuery().getFrom().getId()).setHealth((int) Math.round(arenaMaxHealth * 0.5));
-                    } else {
-                        result += "\n因為你賭命\n" +  petName + "已經死左💀";
-                        dictionary.get(update.getCallbackQuery().getFrom().getId()).setDogAlive(false);
+            if (computer == 1) {//電腦係重戰士
+                if (input == 1) {//狗係重攻擊
+                    result += "\uD83D\uDC36" + petName + "使用(重攻擊)風格戰鬥⚔️\n\n";
+                    if (win == 0) {
+                        result += petName + "遇到(重戰士)生死一擊- 海道\n" +
+                                petName + "開始同海道展開生死對決\n\t\t🗡️" +
+                                petName + "使出吃奶之力，一野撞埋海道度\n" +
+                                "\t\t🗡️️海道都不甘視弱,拿出巨大斧頭，向下一劈\n\t\t🗡️" +
+                                petName + "背部受重創\n\t\t🗡️" +
+                                "不幸戰敗\n\n";
+                        result += petName + "損失左$" + loseMoney + "💸\n";
+                        dictionary.get(update.getCallbackQuery().getFrom().getId()).setCurrency(dictionary.get(update.getCallbackQuery().getFrom().getId()).getCurrency() - loseMoney);
+                        if (arenaHealth > 10) {
+                            result += petName + "只係得翻50%血量💔\n";
+                            dictionary.get(update.getCallbackQuery().getFrom().getId()).setHealth((int) Math.round(arenaMaxHealth * 0.5));
+                        } else {
+                            result += "\n因為你賭命\n" + petName + "已經死左💀";
+                            dictionary.get(update.getCallbackQuery().getFrom().getId()).setDogAlive(false);
+                        }
                     }
-                }
-                if (win == 1) {
-                    result += petName + "遇到(重戰士)生死一擊- 海道\n\t\t🗡️" +
-                             petName + "開始同海道展開生死對決\n\t\t🗡️" +
-                             petName + "氣定神閒，專注儲氣\n\t\t🗡️" +
-                            "海道衝上前，打算拎斧頭砍落" + petName + "度\n\t\t🗡️" +
-                             petName + "係電石火石一刻咬住海道隻腳\n" +
-                            "\t\t🗡️️海道失血過多，昏迷不醒\n\t\t🗡️" +
-                              petName + "打敗左海道\n\n";
-                    result +=  petName + "獲得$" + winMoney + "✔️勝利獎勵";
-                    dictionary.get(update.getCallbackQuery().getFrom().getId()).setCurrency(dictionary.get(update.getCallbackQuery().getFrom().getId()).getCurrency() + winMoney);
-                }
+                    if (win == 1) {
+                        result += petName + "遇到(重戰士)生死一擊- 海道\n\t\t🗡️" +
+                                petName + "開始同海道展開生死對決\n\t\t🗡️" +
+                                petName + "氣定神閒，專注儲氣\n\t\t🗡️" +
+                                "海道衝上前，打算拎斧頭砍落" + petName + "度\n\t\t🗡️" +
+                                petName + "係電石火石一刻咬住海道隻腳\n" +
+                                "\t\t🗡️️海道失血過多，昏迷不醒\n\t\t🗡️" +
+                                petName + "打敗左海道\n\n";
+                        result += petName + "獲得$" + winMoney + "✔️勝利獎勵";
+                        dictionary.get(update.getCallbackQuery().getFrom().getId()).setArenaWinCounter(dictionary.get(update.getCallbackQuery().getFrom().getId()).getArenaWinCounter() + 1);
+                        dictionary.get(update.getCallbackQuery().getFrom().getId()).setCurrency(dictionary.get(update.getCallbackQuery().getFrom().getId()).getCurrency() + winMoney);
+                    }
 
-            } else if (input == 2) {//狗係防禦
-                result += "\uD83D\uDC36" +petName + "使用(防禦)風格戰鬥⚔️\n\n";
-                result +=  petName + "遇到(重戰士)生死一擊- 海道\n" +
-                         petName + "開始同海道展開生死對決\n\t\t🗡️" +
-                         petName + "原地不動，使出銅牆鐵壁\n" +
-                        "\t\t🗡️️海道克一邊蓄力，一邊走向" +  petName + "\n" +
-                        "\t\t🗡️️海道使勁拿斧頭一砍\n\t\t🗡️" +
-                          petName + "受唔住，當埸昏迷\n\t\t🗡️" +
-                         petName + "戰敗\n\n";
-                result += petName + "損失左$" + loseMoney + "💸\n";
-                dictionary.get(update.getCallbackQuery().getFrom().getId()).setCurrency(dictionary.get(update.getCallbackQuery().getFrom().getId()).getCurrency() - loseMoney);
-                if (arenaHealth > 10) {
-                    result +=  petName + "只係得翻50%血量💔\n";
-                    dictionary.get(update.getCallbackQuery().getFrom().getId()).setHealth((int) Math.round(dictionary.get(update.getCallbackQuery().getFrom().getId()).getHealth() * 0.5));
-                } else {
-                    result += "\n因為你賭命\n" +  petName + "已經死左💀";
-                    dictionary.get(update.getCallbackQuery().getFrom().getId()).setDogAlive(false);
-                }
-            } else {//狗係輕攻擊
-                result += "\uD83D\uDC36" +petName + "使用(快攻)風格戰鬥⚔️\n\n";
-                result +=  petName + "遇到(重戰士)生死一擊- 海道\n\t\t🗡️" +
-                          petName + "開始同海道展開生死對決\n\t\t🗡️" +
-                         petName + "使出電光一閃，衝向海道\n" +
-                        "\t\t🗡️️海道儲力向前一砍，打算了結" + petName + "\n\t\t🗡️" +
-                         petName + "避開左海道的攻擊\n\t\t🗡️" +
-                          petName + "不斷向海道使出快攻\n" +
-                        "\t\t🗡️️海道招架不住，戰敗\n\n";
-                result +=  petName + "獲得$" + winMoney + "✔️勝利獎勵";
-                dictionary.get(update.getCallbackQuery().getFrom().getId()).setCurrency(dictionary.get(update.getCallbackQuery().getFrom().getId()).getCurrency() + winMoney);
-            }
-        }
-        if (computer == 2) {//電腦係坦克
-            if (input == 2) {//狗係防禦
-                result += "\uD83D\uDC36" +petName + "使用(防禦)風格戰鬥⚔️\n\n";
-                if (win == 0) {
-                    result +=  petName + "遇到(坦克)鋼鐵堡壘- 大媽\n" +
-                              petName + "開始同大媽展開生死對決\n\t\t🗡️" +
-                              petName + "使出銅牆鐵壁\n" +
-                            "\t\t🗡️️大媽都不甘視弱,使出鋼鐵肌膚\n" +
-                            "\t\t🗡️️雙方不斷使出撞擊，令到地動山搖\n" +
-                             "\t\t🗡️" +  petName + "不敵大媽的鋼鐵肌膚\n" +
-                            "\t\t🗡️️不幸戰敗\n\n";
-                    result +=  petName + "損失左$" + loseMoney + "💸\n";
+                } else if (input == 2) {//狗係防禦
+                    result += "\uD83D\uDC36" + petName + "使用(防禦)風格戰鬥⚔️\n\n";
+                    result += petName + "遇到(重戰士)生死一擊- 海道\n" +
+                            petName + "開始同海道展開生死對決\n\t\t🗡️" +
+                            petName + "原地不動，使出銅牆鐵壁\n" +
+                            "\t\t🗡️️海道克一邊蓄力，一邊走向" + petName + "\n" +
+                            "\t\t🗡️️海道使勁拿斧頭一砍\n\t\t🗡️" +
+                            petName + "受唔住，當埸昏迷\n\t\t🗡️" +
+                            petName + "戰敗\n\n";
+                    result += petName + "損失左$" + loseMoney + "💸\n";
                     dictionary.get(update.getCallbackQuery().getFrom().getId()).setCurrency(dictionary.get(update.getCallbackQuery().getFrom().getId()).getCurrency() - loseMoney);
                     if (arenaHealth > 10) {
-                        result +=  petName + "只係得翻50%血量💔\n";
+                        result += petName + "只係得翻50%血量💔\n";
                         dictionary.get(update.getCallbackQuery().getFrom().getId()).setHealth((int) Math.round(dictionary.get(update.getCallbackQuery().getFrom().getId()).getHealth() * 0.5));
                     } else {
-                        result += "\n因為你賭命\n" +  petName + "已經死左💀";
+                        result += "\n因為你賭命\n" + petName + "已經死左💀";
                         dictionary.get(update.getCallbackQuery().getFrom().getId()).setDogAlive(false);
                     }
-                }
-                if (win == 1) {
-                    result +=  petName + "遇到(坦克)鋼鐵堡壘- 大媽\n" +
-                             petName + "開始同大媽展開生死對決\n\t\t🗡️" +
-                              petName + "使出銅牆鐵壁\n" +
-                            "\t\t🗡️️大媽都不甘視弱,使出鋼鐵肌膚\n" +
-                            "\t\t🗡️️雙方不斷使出撞擊，令到地動山搖\n" +
-                             petName + "係即將戰敗之際，使出仰天長嘯\n\t\t🗡️" +
-                             petName + "憑毅力戰勝大媽\n️" ;
-                    result +=  petName + "獲得$" + winMoney + "✔️勝利獎勵";
+                } else {//狗係輕攻擊
+                    result += "\uD83D\uDC36" + petName + "使用(快攻)風格戰鬥⚔️\n\n";
+                    result += petName + "遇到(重戰士)生死一擊- 海道\n\t\t🗡️" +
+                            petName + "開始同海道展開生死對決\n\t\t🗡️" +
+                            petName + "使出電光一閃，衝向海道\n" +
+                            "\t\t🗡️️海道儲力向前一砍，打算了結" + petName + "\n\t\t🗡️" +
+                            petName + "避開左海道的攻擊\n\t\t🗡️" +
+                            petName + "不斷向海道使出快攻\n" +
+                            "\t\t🗡️️海道招架不住，戰敗\n\n";
+                    result += petName + "獲得$" + winMoney + "✔️勝利獎勵";
+                    dictionary.get(update.getCallbackQuery().getFrom().getId()).setArenaWinCounter(dictionary.get(update.getCallbackQuery().getFrom().getId()).getArenaWinCounter() + 1);
                     dictionary.get(update.getCallbackQuery().getFrom().getId()).setCurrency(dictionary.get(update.getCallbackQuery().getFrom().getId()).getCurrency() + winMoney);
                 }
-
-            } else if (input == 0) {//狗係輕攻擊
-                result += "\uD83D\uDC36" +petName + "使用(快攻)風格戰鬥⚔️\n\n";
-                result +=  petName + "遇到(坦克)鋼鐵堡壘- 大媽\n" +
-                          petName + "開始同大媽展開生死對決\n" +
-                        "\t\t🗡️️大媽使出鋼鐵肌膚同屹立不倒\n\t\t🗡️" +
-                         petName + "不斷向大媽使出攻擊\n" +
-                        "\t\t🗡️️但好似對大媽一啲用都無\n" +
-                        "\t\t🗡️" + petName + "開始體力不支\n" +
-                        "\t\t🗡️️大媽乘勝追擊，對" +  petName + "使出泰山壓頂\n\t\t🗡️" +
-                         petName + "戰敗\n\n";
-                result +=  petName + "損失左$" + loseMoney + "💸\n";
-                dictionary.get(update.getCallbackQuery().getFrom().getId()).setCurrency(dictionary.get(update.getCallbackQuery().getFrom().getId()).getCurrency() - loseMoney);
-                if (arenaHealth > 10) {
-                    result +=  petName + "只係得翻50%血量💔\n";
-                    dictionary.get(update.getCallbackQuery().getFrom().getId()).setHealth((int) Math.round(dictionary.get(update.getCallbackQuery().getFrom().getId()).getHealth() * 0.5));
-                } else {
-                    result += "\n因為你賭命\n" +  petName + "已經死左💀";
-                    dictionary.get(update.getCallbackQuery().getFrom().getId()).setDogAlive(false);
-                }
-            } else {//狗係重攻擊
-                result += "\uD83D\uDC36" +petName + "使用(重攻擊)風格戰鬥⚔️\n\n";
-                result +=  petName + "遇到(坦克)鋼鐵堡壘- 大媽\n\t\t🗡️" +
-                          petName + "開始同大媽展開生死對決\n\t\t🗡️" +
-                          petName + "蓄力衝向大媽\n" +
-                        "\t\t🗡️️大媽使出鋼鐵肌膚同屹立不倒\n\t\t🗡️" +
-                          petName + "使出憤力一咬\n" +
-                        "\t\t🗡️️大媽抵當不住，戰敗\n\n";
-                result +=  petName + "獲得$" + winMoney + "✔️勝利獎勵";
-                dictionary.get(update.getCallbackQuery().getFrom().getId()).setCurrency(dictionary.get(update.getCallbackQuery().getFrom().getId()).getCurrency() + winMoney);
             }
-        }
-        if (dictionary.get(update.getCallbackQuery().getFrom().getId()).getHealth() <10){
-            result += "\n\n‼注意‼\n‼‼‼‼‼你血量係10以下‼‼‼‼‼\n再輸\uD83D\uDC36"+petName+"就會死\uD83D\uDC80";
-        }
-        dictionary.get(update.getCallbackQuery().getFrom().getId()).setArenaCounter(dictionary.get(update.getCallbackQuery().getFrom().getId()).getArenaCounter() + 1);
-        return result;
+            if (computer == 2) {//電腦係坦克
+                if (input == 2) {//狗係防禦
+                    result += "\uD83D\uDC36" + petName + "使用(防禦)風格戰鬥⚔️\n\n";
+                    if (win == 0) {
+                        result += petName + "遇到(坦克)鋼鐵堡壘- 大媽\n" +
+                                petName + "開始同大媽展開生死對決\n\t\t🗡️" +
+                                petName + "使出銅牆鐵壁\n" +
+                                "\t\t🗡️️大媽都不甘視弱,使出鋼鐵肌膚\n" +
+                                "\t\t🗡️️雙方不斷使出撞擊，令到地動山搖\n" +
+                                "\t\t🗡️" + petName + "不敵大媽的鋼鐵肌膚\n" +
+                                "\t\t🗡️️不幸戰敗\n\n";
+                        result += petName + "損失左$" + loseMoney + "💸\n";
+                        dictionary.get(update.getCallbackQuery().getFrom().getId()).setCurrency(dictionary.get(update.getCallbackQuery().getFrom().getId()).getCurrency() - loseMoney);
+                        if (arenaHealth > 10) {
+                            result += petName + "只係得翻50%血量💔\n";
+                            dictionary.get(update.getCallbackQuery().getFrom().getId()).setHealth((int) Math.round(dictionary.get(update.getCallbackQuery().getFrom().getId()).getHealth() * 0.5));
+                        } else {
+                            result += "\n因為你賭命\n" + petName + "已經死左💀";
+                            dictionary.get(update.getCallbackQuery().getFrom().getId()).setDogAlive(false);
+                        }
+                    }
+                    if (win == 1) {
+                        result += petName + "遇到(坦克)鋼鐵堡壘- 大媽\n" +
+                                petName + "開始同大媽展開生死對決\n\t\t🗡️" +
+                                petName + "使出銅牆鐵壁\n" +
+                                "\t\t🗡️️大媽都不甘視弱,使出鋼鐵肌膚\n" +
+                                "\t\t🗡️️雙方不斷使出撞擊，令到地動山搖\n" +
+                                petName + "係即將戰敗之際，使出仰天長嘯\n\t\t🗡️" +
+                                petName + "憑毅力戰勝大媽\n️";
+                        result += petName + "獲得$" + winMoney + "✔️勝利獎勵";
+                        dictionary.get(update.getCallbackQuery().getFrom().getId()).setArenaWinCounter(dictionary.get(update.getCallbackQuery().getFrom().getId()).getArenaWinCounter() + 1);
+                        dictionary.get(update.getCallbackQuery().getFrom().getId()).setCurrency(dictionary.get(update.getCallbackQuery().getFrom().getId()).getCurrency() + winMoney);
+                    }
+
+                } else if (input == 0) {//狗係輕攻擊
+                    result += "\uD83D\uDC36" + petName + "使用(快攻)風格戰鬥⚔️\n\n";
+                    result += petName + "遇到(坦克)鋼鐵堡壘- 大媽\n" +
+                            petName + "開始同大媽展開生死對決\n" +
+                            "\t\t🗡️️大媽使出鋼鐵肌膚同屹立不倒\n\t\t🗡️" +
+                            petName + "不斷向大媽使出攻擊\n" +
+                            "\t\t🗡️️但好似對大媽一啲用都無\n" +
+                            "\t\t🗡️" + petName + "開始體力不支\n" +
+                            "\t\t🗡️️大媽乘勝追擊，對" + petName + "使出泰山壓頂\n\t\t🗡️" +
+                            petName + "戰敗\n\n";
+                    result += petName + "損失左$" + loseMoney + "💸\n";
+                    dictionary.get(update.getCallbackQuery().getFrom().getId()).setCurrency(dictionary.get(update.getCallbackQuery().getFrom().getId()).getCurrency() - loseMoney);
+                    if (arenaHealth > 10) {
+                        result += petName + "只係得翻50%血量💔\n";
+                        dictionary.get(update.getCallbackQuery().getFrom().getId()).setHealth((int) Math.round(dictionary.get(update.getCallbackQuery().getFrom().getId()).getHealth() * 0.5));
+                    } else {
+                        result += "\n因為你賭命\n" + petName + "已經死左💀";
+                        dictionary.get(update.getCallbackQuery().getFrom().getId()).setDogAlive(false);
+                    }
+                } else {//狗係重攻擊
+                    result += "\uD83D\uDC36" + petName + "使用(重攻擊)風格戰鬥⚔️\n\n";
+                    result += petName + "遇到(坦克)鋼鐵堡壘- 大媽\n\t\t🗡️" +
+                            petName + "開始同大媽展開生死對決\n\t\t🗡️" +
+                            petName + "蓄力衝向大媽\n" +
+                            "\t\t🗡️️大媽使出鋼鐵肌膚同屹立不倒\n\t\t🗡️" +
+                            petName + "使出憤力一咬\n" +
+                            "\t\t🗡️️大媽抵當不住，戰敗\n\n";
+                    result += petName + "獲得$" + winMoney + "✔️勝利獎勵";
+                    dictionary.get(update.getCallbackQuery().getFrom().getId()).setArenaWinCounter(dictionary.get(update.getCallbackQuery().getFrom().getId()).getArenaWinCounter() + 1);
+                    dictionary.get(update.getCallbackQuery().getFrom().getId()).setCurrency(dictionary.get(update.getCallbackQuery().getFrom().getId()).getCurrency() + winMoney);
+                }
+            }
+            if (dictionary.get(update.getCallbackQuery().getFrom().getId()).getHealth() < 10) {
+                result += "\n\n‼注意‼\n‼‼‼‼‼你血量係10以下‼‼‼‼‼\n再輸\uD83D\uDC36" + petName + "就會死\uD83D\uDC80";
+            }
+            dictionary.get(update.getCallbackQuery().getFrom().getId()).setArenaCounter(dictionary.get(update.getCallbackQuery().getFrom().getId()).getArenaCounter() + 1);
+            return result;
     }
     public String exploreTheWorld(Update update) {
         String result = "";
-
-/*       // int tempRandom = (int) (Math.random() * (1-0+1)+0);
+        int randomStatement = (int) (Math.random() * (16-0+1)+0);
+        /*int tempRandom = (int) (Math.random() * (1-0+1)+0);
         if (tempRandom == 0)
             randomStatement = 5;
         else {
             randomStatement = 12;
         }*/
-        //5
-        int randomStatement = (int) (Math.random() * (13-0+1)+0);
+        //int randomStatement = (int) (Math.random() * (16-0+1)+0);
         if (randomStatement == 0) {
             int cash = (int) (Math.random() * (50 - 1 + 1) + 1);
-            int exp = (int) (Math.random() * (12 - 1 + 1) + 1) * dictionary.get(update.getMessage().getFrom().getId()).getLevel();
+            int exp = (int) (Math.random() * (1 - 1 + 1) + 1) * dictionary.get(update.getMessage().getFrom().getId()).getLevel();
             result += "搵到一個寶箱\uD83C\uDF81\n";
             result += "打開後有$" + cash;
             result += "同埋陳年古書\n" +
@@ -842,8 +853,9 @@ public class doggyBot extends TelegramLongPollingBot {
             int loss1 = levelUpDMG(update, loss);
             int exp = (int) (Math.random() * (12 - 1 + 1) + 1) * dictionary.get(update.getMessage().getFrom().getId()).getLevel();
             result += "遇到BOSS-穿著博士袍的黃色章魚老師\uD83D\uDC7E\n";
-            result += "\n佢打輸左比黃色章魚老師\uD83D\uDC7E\n生命\uD83D\uDC94減左" + loss1;
             dictionary.get(update.getMessage().getFrom().getId()).setHealth(dictionary.get(update.getMessage().getFrom().getId()).getHealth() - loss1);
+            result += "\n佢打輸左比黃色章魚老師\uD83D\uDC7E\n生命\uD83D\uDC94減左" + loss1+ "\n而家既血量係:" + dictionary.get(update.getMessage().getFrom().getId()).getHealth();
+
         }
         if (randomStatement == 2) {
             int cash = (int) (Math.random() * (50 - 1 + 1) + 1);
@@ -868,8 +880,8 @@ public class doggyBot extends TelegramLongPollingBot {
 
             }
             if (win == 1) {
-                result += "\n佢打輸左比HTML怪物\uD83D\uDC7E\n生命\uD83D\uDC94減左" + loss1;
                     dictionary.get(update.getMessage().getFrom().getId()).setHealth(dictionary.get(update.getMessage().getFrom().getId()).getHealth() - loss1);
+                result += "\n佢打輸左比HTML怪物\uD83D\uDC7E\n生命\uD83D\uDC94減左" + loss1 + "\n而家既血量係:" + dictionary.get(update.getMessage().getFrom().getId()).getHealth();
             }
         }
         if (randomStatement == 4) {
@@ -881,7 +893,7 @@ public class doggyBot extends TelegramLongPollingBot {
             dictionary.get(update.getMessage().getFrom().getId()).setCurrency(dictionary.get(update.getMessage().getFrom().getId()).getCurrency() + cash);
             dictionary.get(update.getMessage().getFrom().getId()).setExp(dictionary.get(update.getMessage().getFrom().getId()).getExp() + exp);
         }
-        if (randomStatement == 5) {
+        if (randomStatement == 5 || randomStatement == 16) {
             int random = (int) (int) (Math.random() * (5 - 0 + 1) + 0);
             if (dictionary.get(update.getMessage().getFrom().getId()).getFoundFriends().containsKey(allFreinds[random])) {
                 if (dictionary.get(update.getMessage().getFrom().getId()).getFoundFriends().get(allFreinds[random]) + 2 < 100) {
@@ -913,9 +925,8 @@ public class doggyBot extends TelegramLongPollingBot {
 
             }
             if (win == 1) {
-                result += "\n佢打輸左比CSS怪物\uD83D\uDC7E\n生命\uD83D\uDC94減左" + loss1;
                 dictionary.get(update.getMessage().getFrom().getId()).setHealth(dictionary.get(update.getMessage().getFrom().getId()).getHealth() - loss1);
-
+                result += "\n佢打輸左比CSS怪物\uD83D\uDC7E\n生命\uD83D\uDC94減左" + loss1+ "\n而家既血量係:" + dictionary.get(update.getMessage().getFrom().getId()).getHealth();
             }
         }
         if (randomStatement == 8) {
@@ -932,8 +943,9 @@ public class doggyBot extends TelegramLongPollingBot {
 
             }
             if (win == 1) {
-                result += "\n佢打輸左比Javascript怪物\uD83D\uDC7E\n生命\uD83D\uDC94減左" + loss1;
                 dictionary.get(update.getMessage().getFrom().getId()).setHealth(dictionary.get(update.getMessage().getFrom().getId()).getHealth() - loss1);
+                result += "\n佢打輸左比Javascript怪物\uD83D\uDC7E\n生命\uD83D\uDC94減左" + loss1+ "\n而家既血量係:" + dictionary.get(update.getMessage().getFrom().getId()).getHealth();
+
             }
         }
         if (randomStatement == 9) {
@@ -950,8 +962,9 @@ public class doggyBot extends TelegramLongPollingBot {
 
             }
             if (win == 1) {
-                result += "\n佢打輸左比React怪物\uD83D\uDC7E\n生命\uD83D\uDC94減左" + loss1;
                 dictionary.get(update.getMessage().getFrom().getId()).setHealth(dictionary.get(update.getMessage().getFrom().getId()).getHealth() - loss1);
+                result += "\n佢打輸左比React怪物\uD83D\uDC7E\n生命\uD83D\uDC94減左" + loss1+ "\n而家既血量係:" + dictionary.get(update.getMessage().getFrom().getId()).getHealth();
+
             }
         }
         if (randomStatement == 10) {
@@ -968,7 +981,7 @@ public class doggyBot extends TelegramLongPollingBot {
             result += "有$" + cash;
             dictionary.get(update.getMessage().getFrom().getId()).setCurrency(dictionary.get(update.getMessage().getFrom().getId()).getCurrency() + cash);
         }
-        if (randomStatement == 12) {
+        if (randomStatement == 12 || randomStatement == 14) {
             int cash = (int) (Math.random() * (50 - 1 + 1) + 1);
             int random = (int) (Math.random() * (11 - 0 + 1) + 0);
             result += "打劫成功\uD83C\uDF81\n";
@@ -983,7 +996,7 @@ public class doggyBot extends TelegramLongPollingBot {
                 dictionary.get(update.getMessage().getFrom().getId()).getGiftInventory().put(allItems[random], 1);
             }
         }
-        if (randomStatement == 13) {
+        if (randomStatement == 13 || randomStatement == 15 ) {
             int cash = (int) (Math.random() * (50 - 1 + 1) + 1);
             int random = (int) (Math.random() * (11 - 0 + 1) + 0);
             result += "係路上執到" + allItems[random];
@@ -1214,7 +1227,9 @@ public class doggyBot extends TelegramLongPollingBot {
                         }
                     }
                     if (command.equals("/version")) {
-                        message.setText("小狗的RPG歷險記\uD83D\uDC36\n" +
+                        message.setText("小狗的RPG歷險記\uD83D\uDC36\n\n" +
+                                "V1.5.1更新 最終版測試(12/11/2019)\n" +
+                                "-修復不少錯誤\n" +
                                 "V1.5更新 最終版測試(12/11/2019)\n" +
                                 "-新增好友系統\n" +
                                 "-新增送禮系統\n" +
@@ -1222,7 +1237,7 @@ public class doggyBot extends TelegramLongPollingBot {
                                 "-增加新成就\n" +
                                 "\uD83D\uDC36\uD83D\uDC36\uD83D\uDC36\uD83D\uDC36\uD83D\uDC36\uD83D\uDC36\uD83D\uDC36\uD83D\uDC36\uD83D\uDC36\uD83D\uDC36\uD83D\uDC36\uD83D\uDC36\uD83D\uDC36\uD83D\uDC36\n" +
                                 "更新預告\uD83D\uDD5B\n" +
-                                "\uD83C\uDF1FV1.5.1更新\n" +
+                                "\uD83C\uDF1FV1.5.2更新\n" +
                                 "-修復所有bugs\n" +
                                 "\n" +
                                 "\uD83D\uDD19\uD83D\uDD19\uD83D\uDD19\uD83D\uDD19\uD83D\uDD19\uD83D\uDD19\uD83D\uDD19\uD83D\uDD19\uD83D\uDD19\uD83D\uDD19\uD83D\uDD19\uD83D\uDD19\uD83D\uDD19\uD83D\uDD19\n" +
@@ -1351,20 +1366,23 @@ public class doggyBot extends TelegramLongPollingBot {
                     }
                     if (command.equals("/combat")) {
                         if (dictionary.get(update.getMessage().getFrom().getId()).isInArena()) {
-                            message.setText(dictionary.get(update.getMessage().getFrom().getId()).getName()+ "已經減左飢餓度: 5\n" +
-                                    "你要" + dictionary.get(update.getMessage().getFrom().getId()).getName() + "用咩類型的戰鬥風格?");
-                            InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
-                            List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
-                            List<InlineKeyboardButton> rowInline = new ArrayList<>();
-                            dictionary.get(update.getMessage().getFrom().getId()).setHunger(dictionary.get(update.getMessage().getFrom().getId()).getHunger() - 5);
-                            rowInline.add(new InlineKeyboardButton().setText("快攻").setCallbackData("attack_fast"));
-                            rowInline.add(new InlineKeyboardButton().setText("重攻擊").setCallbackData("attack_heavy"));
-                            rowInline.add(new InlineKeyboardButton().setText("防守").setCallbackData("attack_defense"));
-                            // Set the keyboard to the markup
-                            rowsInline.add(rowInline);
-                            // Add it to the message
-                            markupInline.setKeyboard(rowsInline);
-                            message.setReplyMarkup(markupInline);
+                            if (!checkArenaDead(update)){
+                                message.setText(dictionary.get(update.getMessage().getFrom().getId()).getName()+ "已經減左飢餓度: 5\n" +
+                                        "你要" + dictionary.get(update.getMessage().getFrom().getId()).getName() + "用咩類型的戰鬥風格?");
+                                InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
+                                List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
+                                List<InlineKeyboardButton> rowInline = new ArrayList<>();
+                                dictionary.get(update.getMessage().getFrom().getId()).setHunger(dictionary.get(update.getMessage().getFrom().getId()).getHunger() - 5);
+                                rowInline.add(new InlineKeyboardButton().setText("快攻").setCallbackData("attack_fast"));
+                                rowInline.add(new InlineKeyboardButton().setText("重攻擊").setCallbackData("attack_heavy"));
+                                rowInline.add(new InlineKeyboardButton().setText("防守").setCallbackData("attack_defense"));
+                                // Set the keyboard to the markup
+                                rowsInline.add(rowInline);
+                                // Add it to the message
+                                markupInline.setKeyboard(rowsInline);
+                                message.setReplyMarkup(markupInline);
+                            }else
+                                message.setText("你飢餓足不足，無得打");
                         }
                         else{
                             message.setText("你仲未進入競技埸，係咪想同空氣對打?\n" +
@@ -1472,7 +1490,6 @@ public class doggyBot extends TelegramLongPollingBot {
                     }
                     //當玩家輸入/explore
                     if (command.equals("/explore")) {
-                        String explore_msg = "";
                         int[] seconds = {1, 1, 1};
                         int random = (int) (Math.random() * (2 - 0 + 1) + 0);
                         //System.out.println("random: " + random);
@@ -1675,12 +1692,12 @@ public class doggyBot extends TelegramLongPollingBot {
             if (call_data.equals("food_lollipop")) {
                 if (!(dictionary.get(update.getCallbackQuery().getFrom().getId()).getHunger() + 30 > 100)) {
                     if (dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().containsKey("波板糖") && dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().get("波板糖") > 0) {
-                        new_message.setText("餵左物品庫裹面的波板糖\n");
                         if (dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().get("波板糖") > 1)
                             dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().put("波板糖", dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().get("生日蛋糕") - 1);
                         else
                             dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().remove("波板糖");
                         dictionary.get(update.getCallbackQuery().getFrom().getId()).setHunger(dictionary.get(update.getCallbackQuery().getFrom().getId()).getHunger() + 30);
+                        new_message.setText("餵左物品庫裹面的波板糖\n飢餓值增加左: 30\nHP恢復左25\n"+ "而家既血量係:" + dictionary.get(update.getCallbackQuery().getFrom().getId()).getHealth());
                         //HP
                         if ((dictionary.get(update.getCallbackQuery().getFrom().getId()).getHealth() + 25) > dictionary.get(update.getCallbackQuery().getFrom().getId()).getMaximumHealth()) {
                             dictionary.get(update.getCallbackQuery().getFrom().getId()).setHealth(dictionary.get(update.getCallbackQuery().getFrom().getId()).getMaximumHealth()); //set最大生命值
@@ -1688,7 +1705,6 @@ public class doggyBot extends TelegramLongPollingBot {
                             dictionary.get(update.getCallbackQuery().getFrom().getId()).setHealth(dictionary.get(update.getCallbackQuery().getFrom().getId()).getHealth() + 25);
                         }
                     } else if (dictionary.get(update.getCallbackQuery().getFrom().getId()).getCurrency() >= 200) {
-                        new_message.setText("用$200餵左波板糖\n飢餓值增加左: 30\nHP恢復左25");
                         dictionary.get(update.getCallbackQuery().getFrom().getId()).setCurrency(dictionary.get(update.getCallbackQuery().getFrom().getId()).getCurrency() - 200);
                         dictionary.get(update.getCallbackQuery().getFrom().getId()).setHunger(dictionary.get(update.getCallbackQuery().getFrom().getId()).getHunger() + 30);
                         //HP
@@ -1697,6 +1713,7 @@ public class doggyBot extends TelegramLongPollingBot {
                         } else {
                             dictionary.get(update.getCallbackQuery().getFrom().getId()).setHealth(dictionary.get(update.getCallbackQuery().getFrom().getId()).getHealth() + 25);
                         }
+                        new_message.setText("用$200餵左波板糖\n飢餓值增加左: 30\nHP恢復左25\n"+ "而家既血量係:" + dictionary.get(update.getCallbackQuery().getFrom().getId()).getHealth());
                     } else {
                         new_message.setText(("你無足夠的錢"));
                     }
@@ -1708,22 +1725,22 @@ public class doggyBot extends TelegramLongPollingBot {
             if (call_data.equals("food_birthdaycake")) {
                 if (!(dictionary.get(update.getCallbackQuery().getFrom().getId()).getHunger() + 75 > 100)) {
                     if (dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().containsKey("生日蛋糕") && dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().get("生日蛋糕") > 0) {
-                        new_message.setText("餵左物品庫裹面的生日蛋糕\n");
                         if (dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().get("生日蛋糕") > 1)
                             dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().put("生日蛋糕", dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().get("生日蛋糕") - 1);
                         else
                             dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().remove("生日蛋糕");
                         dictionary.get(update.getCallbackQuery().getFrom().getId()).setHunger(dictionary.get(update.getCallbackQuery().getFrom().getId()).getHunger() + 75);
                         dictionary.get(update.getCallbackQuery().getFrom().getId()).setHealth(dictionary.get(update.getCallbackQuery().getFrom().getId()).getMaximumHealth());
-
+                        new_message.setText("餵左物品庫裹面的生日蛋糕\n飢餓值增加左: 75\nHP完全恢復"+ "而家既血量係:" + dictionary.get(update.getCallbackQuery().getFrom().getId()).getHealth());
                     } else if (dictionary.get(update.getCallbackQuery().getFrom().getId()).getCurrency() >= 600) {
-                        new_message.setText("用$600餵左生日蛋糕\n飢餓值增加左: 75\nHP完全恢復");
                         dictionary.get(update.getCallbackQuery().getFrom().getId()).setCurrency(dictionary.get(update.getCallbackQuery().getFrom().getId()).getCurrency() - 600);
                         dictionary.get(update.getCallbackQuery().getFrom().getId()).setHunger(dictionary.get(update.getCallbackQuery().getFrom().getId()).getHunger() + 75);
                         dictionary.get(update.getCallbackQuery().getFrom().getId()).setHealth(dictionary.get(update.getCallbackQuery().getFrom().getId()).getMaximumHealth());
-                    } else {
+                    }
+                    else {
                         new_message.setText(("你無足夠的錢"));
                     }
+                    new_message.setText("用$600餵左生日蛋糕\n飢餓值增加左: 75\nHP完全恢復"+ "而家既血量係:" + dictionary.get(update.getCallbackQuery().getFrom().getId()).getHealth());
                 } else {
                     new_message.setText("\uD83D\uDC3E" + dictionary.get(update.getCallbackQuery().getFrom().getId()).getName() + "會飽到死嫁");
                 }
@@ -1751,7 +1768,7 @@ public class doggyBot extends TelegramLongPollingBot {
             //藥水類
             if (call_data.equals("potion_small")) {
                 if (dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().containsKey("微型生命恢復藥水") && dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().get("微型生命恢復藥水") > 0) {
-                    new_message.setText("餵左物品庫裹面的微型生命恢復藥水\n");
+
                     if (dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().get("微型生命恢復藥水") > 1)
                         dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().put("微型生命恢復藥水", dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().get("微型生命恢復藥水") - 1);
                     else
@@ -1762,22 +1779,21 @@ public class doggyBot extends TelegramLongPollingBot {
                     } else {
                         dictionary.get(update.getCallbackQuery().getFrom().getId()).setHealth(dictionary.get(update.getCallbackQuery().getFrom().getId()).getHealth() + 10);
                     }
+                    new_message.setText("餵左物品庫裹面的微型生命恢復藥水\n"+ "而家既血量係:" + dictionary.get(update.getCallbackQuery().getFrom().getId()).getHealth());
                 } else if (dictionary.get(update.getCallbackQuery().getFrom().getId()).getCurrency() >= 50) {
-                    new_message.setText("用$50買左微型生命恢復藥水\nHP恢復左10");
                     if ((dictionary.get(update.getCallbackQuery().getFrom().getId()).getHealth() + 10) > dictionary.get(update.getCallbackQuery().getFrom().getId()).getMaximumHealth()) {
                         dictionary.get(update.getCallbackQuery().getFrom().getId()).setHealth(dictionary.get(update.getCallbackQuery().getFrom().getId()).getMaximumHealth()); //set最大生命值
                     } else {
                         dictionary.get(update.getCallbackQuery().getFrom().getId()).setHealth(dictionary.get(update.getCallbackQuery().getFrom().getId()).getHealth() + 10);
                     }
                     dictionary.get(update.getCallbackQuery().getFrom().getId()).setCurrency(dictionary.get(update.getCallbackQuery().getFrom().getId()).getCurrency() - 50);
-
+                    new_message.setText("用$50買左微型生命恢復藥水\nHP恢復左10\n" + "而家既血量係:" + dictionary.get(update.getCallbackQuery().getFrom().getId()).getHealth());
                 } else {
                     new_message.setText(("你無足夠的錢"));
                 }
             }
             if (call_data.equals("potion_medium")) {
                 if (dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().containsKey("中型生命恢復藥水") && dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().get("中型生命恢復藥水") > 0) {
-                    new_message.setText("餵左物品庫裹面的中型生命恢復藥水\n");
                     if (dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().get("中型生命恢復藥水") > 1)
                         dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().put("中型生命恢復藥水", dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().get("中型生命恢復藥水") - 1);
                     else
@@ -1787,21 +1803,21 @@ public class doggyBot extends TelegramLongPollingBot {
                     } else {
                         dictionary.get(update.getCallbackQuery().getFrom().getId()).setHealth(dictionary.get(update.getCallbackQuery().getFrom().getId()).getHealth() + 50);
                     }
+                    new_message.setText("餵左物品庫裹面的中型生命恢復藥水\n"+ "而家既血量係:" + dictionary.get(update.getCallbackQuery().getFrom().getId()).getHealth());
                 } else if (dictionary.get(update.getCallbackQuery().getFrom().getId()).getCurrency() >= 250) {
-                    new_message.setText("用$250買左中型生命恢復藥水\nHP恢復左50");
                     if ((dictionary.get(update.getCallbackQuery().getFrom().getId()).getHealth() + 50) > dictionary.get(update.getCallbackQuery().getFrom().getId()).getMaximumHealth()) {
                         dictionary.get(update.getCallbackQuery().getFrom().getId()).setHealth(dictionary.get(update.getCallbackQuery().getFrom().getId()).getMaximumHealth()); //set最大生命值
                     } else {
                         dictionary.get(update.getCallbackQuery().getFrom().getId()).setHealth(dictionary.get(update.getCallbackQuery().getFrom().getId()).getHealth() + 50);
                     }
                     dictionary.get(update.getCallbackQuery().getFrom().getId()).setCurrency(dictionary.get(update.getCallbackQuery().getFrom().getId()).getCurrency() - 250);
+                    new_message.setText("用$250買左中型生命恢復藥水\nHP恢復左50\n"+ "而家既血量係:" + dictionary.get(update.getCallbackQuery().getFrom().getId()).getHealth());
                 } else {
                     new_message.setText(("你無足夠的錢"));
                 }
             }
             if (call_data.equals("potion_large")) {
                 if (dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().containsKey("大型生命恢復藥水") && dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().get("大型生命恢復藥水") > 0) {
-                    new_message.setText("餵左物品庫裹面的大型生命恢復藥水\n");
                     if (dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().get("大型生命恢復藥水") > 1)
                         dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().put("大型生命恢復藥水", dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().get("大型生命恢復藥水") - 1);
                     else
@@ -1811,31 +1827,31 @@ public class doggyBot extends TelegramLongPollingBot {
                     } else {
                         dictionary.get(update.getCallbackQuery().getFrom().getId()).setHealth(dictionary.get(update.getCallbackQuery().getFrom().getId()).getHealth() + 500);
                     }
+                    new_message.setText("餵左物品庫裹面的大型生命恢復藥水\n"+ "而家既血量係:" + dictionary.get(update.getCallbackQuery().getFrom().getId()).getHealth());
                 } else if (dictionary.get(update.getCallbackQuery().getFrom().getId()).getCurrency() >= 500) {
-                    new_message.setText("用$500買左大型生命恢復藥水\nHP恢復左500");
                     if ((dictionary.get(update.getCallbackQuery().getFrom().getId()).getHealth() + 500) > dictionary.get(update.getCallbackQuery().getFrom().getId()).getMaximumHealth()) {
                         dictionary.get(update.getCallbackQuery().getFrom().getId()).setHealth(dictionary.get(update.getCallbackQuery().getFrom().getId()).getMaximumHealth()); //set最大生命值
                     } else {
                         dictionary.get(update.getCallbackQuery().getFrom().getId()).setHealth(dictionary.get(update.getCallbackQuery().getFrom().getId()).getHealth() + 500);
                     }
                     dictionary.get(update.getCallbackQuery().getFrom().getId()).setCurrency(dictionary.get(update.getCallbackQuery().getFrom().getId()).getCurrency() - 500);
-
+                    new_message.setText("用$500買左大型生命恢復藥水\nHP恢復左500\n"+ "而家既血量係:" + dictionary.get(update.getCallbackQuery().getFrom().getId()).getHealth());
                 } else {
                     new_message.setText(("你無足夠的錢"));
                 }
             }
             if (call_data.equals("potion_full")) {
                 if (dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().containsKey("完全恢復藥水") && dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().get("完全恢復藥水") > 0) {
-                    new_message.setText("餵左物品庫裹面的完全恢復藥水\n");
                     if (dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().get("完全恢復藥水") > 1)
                          dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().put("完全恢復藥水", dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().get("完全恢復藥水") - 1);
                     else
                         dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().remove("完全恢復藥水");
                     dictionary.get(update.getCallbackQuery().getFrom().getId()).setHealth(dictionary.get(update.getCallbackQuery().getFrom().getId()).getMaximumHealth());
+                    new_message.setText("餵左物品庫裹面的完全恢復藥水\n"+ "而家既血量係:" + dictionary.get(update.getCallbackQuery().getFrom().getId()).getHealth());
                 } else if (dictionary.get(update.getCallbackQuery().getFrom().getId()).getCurrency() >= 1000) {
-                    new_message.setText("用$1000買左完全恢復藥水\nHP完全恢復");
                     dictionary.get(update.getCallbackQuery().getFrom().getId()).setHealth(dictionary.get(update.getCallbackQuery().getFrom().getId()).getMaximumHealth());
                     dictionary.get(update.getCallbackQuery().getFrom().getId()).setCurrency(dictionary.get(update.getCallbackQuery().getFrom().getId()).getCurrency() - 1000);
+                    new_message.setText("用$1000買左完全恢復藥水\nHP完全恢復\n"+ "而家既血量係:" + dictionary.get(update.getCallbackQuery().getFrom().getId()).getHealth());
                 } else {
                     new_message.setText(("你無足夠的錢"));
                 }
@@ -2272,7 +2288,7 @@ public class doggyBot extends TelegramLongPollingBot {
             }
             if (call_data.equals("主題公園入埸卷")){
                 result4 += "將主題公園入埸卷送左比"+dictionary.get(update.getCallbackQuery().getFrom().getId()).getFriendsPointer() + "\n";
-                result4 += checkGift(update,dictionary.get(update.getCallbackQuery().getFrom().getId()).getFriendsPointer(),"主題公園入埸卷\"");
+                result4 += checkGift(update,dictionary.get(update.getCallbackQuery().getFrom().getId()).getFriendsPointer(),"主題公園入埸卷");
                 if (dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().get("主題公園入埸卷") >1){
                     dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().put("主題公園入埸卷",dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().get("主題公園入埸卷") - 1);
                     dictionary.get(update.getCallbackQuery().getFrom().getId()).getGiftInventory().put("主題公園入埸卷",dictionary.get(update.getCallbackQuery().getFrom().getId()).getInventory().get("主題公園入埸卷") - 1);

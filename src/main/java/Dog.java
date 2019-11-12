@@ -53,7 +53,7 @@ public class Dog {
     public Dog() {
         this.health = 30;
         this.maximumHealth = 30;
-        this.hunger = 50;
+        this.hunger = 5;
         //this.current = current;
         this.generation = 1;
         //this.love = 0;
